@@ -1,0 +1,5 @@
+- console
+- handling incoming usb packets
+- configuring interrupts
+- sending the status byte
+- storing the status in eeprom on interrupt?

@@ -44,13 +44,12 @@ void naiboard_uart_init(void) {
     stdout = &mystdout;
     stdin = &mystdout;
 
-	USARTPORT.DIRSET = USARTTXPIN;
-	USARTPORT.DIRCLR = USARTRXPIN;
+	PORT_SetPinsAsOutput(&USARTPORT, USARTTXPIN);
+	PORT_ConfigurePins(&USARTPORT, USARTTXPIN, false, false, PORT_OPC_WIREDANDPULL_gc, PORT_ISC_INPUT_DISABLE_gc);
+	PORT_SetPinsAsInput(&USARTPORT, USARTRXPIN);
+	PORT_ConfigurePins(&USARTPORT, USARTRXPIN, false, false, PORT_OPC_PULLDOWN_gc, PORT_ISC_FALLING_gc);
 	USART_Format_Set(&USARTMODULE, USART_CHSIZE_8BIT_gc, USART_PMODE_DISABLED_gc, false);
-//	USART_Baudrate_Set(&USARTMODULE, 3317, -4); // 32MHz, 9600bps
-//	USART_Baudrate_Set(&USARTMODULE, 1047, -6); // 32MHz, 115200bps
 	USART_Baudrate_Set(&USARTMODULE, 1603, -6); // 48MHz, 115200bps
-//	USART_Baudrate_Set(&USARTMODULE, 769, -6); // 24MHz, 115200bps
 	USART_Rx_Enable(&USARTMODULE);
 	USART_Tx_Enable(&USARTMODULE);
 }
@@ -59,9 +58,7 @@ void naiboard_delay_ms(uint16_t ms) {
 	uint16_t i;
 	for (i = 0; i < ms; i++) {
 		_delay_ms(1);
-#ifdef ARCH_AVR
 		WDT_Reset(); // Watchdog reset
-#endif
 	}
 }
 
@@ -69,29 +66,21 @@ void naiboard_delay_us(uint16_t us) {
 	uint16_t i;
 	for (i = 0; i < us; i++) {
 		_delay_us(1);
-#ifdef ARCH_AVR
 		WDT_Reset(); // Watchdog reset
-#endif
 	}
 }
 
 static void naiboard_led1_init(void) {
-#ifdef LED1PORT
     LED1PORT.DIRSET = LED1PIN;
     LED1PORT.OUTCLR = LED1PIN;
-#endif
 }
 
 void naiboard_led1_on(void) {
-#ifdef LED1PORT
-    LED1PORT.OUTSET = LED1PIN;
-#endif
+    LED1PORT.OUTCLR = LED1PIN;
 }
 
 void naiboard_led1_off(void) {
-#ifdef LED1PORT
-    LED1PORT.OUTCLR = LED1PIN;
-#endif
+    LED1PORT.OUTSET = LED1PIN;
 }
 
 void naiboard_led_init(void) {
@@ -105,9 +94,7 @@ void naiboard_sleep(void) {
 	SLEEP.CTRL = SLEEP_SMODE_IDLE_gc;
 
 	sysclk_disable_peripheral_clock(&RTC);
-#ifdef LOG
 	//printf_P(PSTR("sleep\n"));
-#endif
 
 	WDT_Disable();
 	sleep_enable();
@@ -117,9 +104,7 @@ void naiboard_sleep(void) {
 	sleep_disable();
 	WDT_Enable();
 	sysclk_enable_peripheral_clock(&RTC);
-#ifdef LOG
 	//printf_P(PSTR("wake\n"));
-#endif
 }
 
 // period == 1024 -> 1 sec resolution

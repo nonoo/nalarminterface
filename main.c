@@ -19,7 +19,7 @@ int main() {
 
 	while (1) {
 		WDT_Reset();
-		naiboard_sleep();
+//		naiboard_sleep();
 	}
 
     return 0;

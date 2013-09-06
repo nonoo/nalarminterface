@@ -14,7 +14,7 @@
 #define USARTTXPIN				PIN3_bm
 
 #define LED1PORT				PORTA
-#define LED1PIN					PIN1_bm
+#define LED1PIN					PIN0_bm
 
 #define P1PORT					PORTF
 #define P1PIN					PIN6_bm
