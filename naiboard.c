@@ -8,9 +8,13 @@
 #include "naiboard-usb.h"
 #include "naiboard-rtc.h"
 #include "naiboard-uart.h"
+#include "naiboard-eeprom.h"
 #include "powersaving.h"
 
 volatile naiboard_state_t naiboard_state;
+
+void naiboard_readstatus(volatile nai_statusbyte_t *statusbyte) {
+}
 
 void naiboard_delay_ms(uint16_t ms) {
 	uint16_t i;
@@ -68,6 +72,7 @@ void naiboard_init(void) {
 	naiboard_led_init();
 	naiboard_uart_init();
 	naiboard_usb_init();
+	naiboard_eeprom_init();
 
 	naiboard_led1_on();
 	naiboard_delay_ms(50);
