@@ -1,6 +1,7 @@
 #include <avr/avr_compiler.h>
 
 #include "boardconfig.h"
+#include "conf_usb.h"
 #include "naiboard.h"
 #include "nai.h"
 

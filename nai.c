@@ -3,7 +3,7 @@
 #include <avr/avr_compiler.h>
 
 #include "nai.h"
-#include "naiboard.h"
+#include "naiboard-usb.h"
 #include "types.h"
 
 #include <avr/port_driver.h>
@@ -25,6 +25,7 @@ void nai_usbpacket_received(nai_usbpacket_t *cmd) {
 	printf_P(PSTR("nai_usbpacket_received(): "));
 
 	memset(&response, 0, sizeof(nai_usbpacket_t));
+	response.type = cmd->type | NAI_USBPACKET_TYPE_RESPONSE;
 	switch (*(uint8_t *)cmd) {
 		// TODO
 	}
