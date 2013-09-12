@@ -1,5 +1,2 @@
-- console
-- handling incoming usb packets
-- configuring interrupts
-- sending the status byte
-- storing the status in eeprom on interrupt?
+- sending the status byte every 100ms until it's been reset
+- status byte reset usb command
