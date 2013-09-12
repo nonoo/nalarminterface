@@ -53,6 +53,13 @@ ISR(P4INTVECT) {
 	nai_statusbyte.p4int = 1;
 }
 
+void naiboard_reset(void) {
+	cli();
+	wdt_enable(WDTO_15MS);
+	while (1)
+		;
+}
+
 void naiboard_delay_ms(uint16_t ms) {
 	uint16_t i;
 	for (i = 0; i < ms; i++) {

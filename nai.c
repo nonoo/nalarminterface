@@ -4,6 +4,7 @@
 
 #include "nai.h"
 #include "naiboard-usb.h"
+#include "naiboard-adc.h"
 #include "naiboard-eeprom.h"
 #include "naiboard.h"
 #include "types.h"
@@ -54,5 +55,41 @@ void nai_usbpacket_received(nai_usbpacket_t *cmd) {
 	}
 }
 
-void nai_processconsolecommand(char *cmd) {
+void nai_processconsolecommand(char *buffer) {
+	char *tok;
+
+	tok = strtok(buffer, " "); // Getting the command
+	if (tok == NULL)
+		return;
+
+	if (strcmp(tok, "help") == 0 || strcmp(tok, "h") == 0) {
+		printf_P(PSTR("  rst     - reset\n"));
+		printf_P(PSTR("  vcp     - uc vcc print\n"));
+		printf_P(PSTR("  stp     - status byte print\n"));
+		printf_P(PSTR("  ecp     - eeprom counter print\n"));
+		return;
+	}
+	if (strcmp(tok, "rst") == 0) {
+		naiboard_reset();
+		return;
+	}
+	if (strcmp(tok, "vcp") == 0) {
+		printf_P(PSTR("vcc: %fV\n"), naiboard_get_vcc());
+		return;
+	}
+	if (strcmp(tok, "stp") == 0) {
+		printf_P(PSTR("statusbyte: P1state - %d\n"), nai_statusbyte.p1state);
+		printf_P(PSTR("            P1int   - %d\n"), nai_statusbyte.p1int);
+		printf_P(PSTR("            P2state - %d\n"), nai_statusbyte.p2state);
+		printf_P(PSTR("            P2int   - %d\n"), nai_statusbyte.p2int);
+		printf_P(PSTR("            P3state - %d\n"), nai_statusbyte.p3state);
+		printf_P(PSTR("            P3int   - %d\n"), nai_statusbyte.p3int);
+		printf_P(PSTR("            P4state - %d\n"), nai_statusbyte.p4state);
+		printf_P(PSTR("            P4int   - %d\n"), nai_statusbyte.p4int);
+		return;
+	}
+	if (strcmp(tok, "ecp") == 0) {
+		printf_P(PSTR("eeprom counter: %d\n"), naiboard_eeprom_readcounter());
+		return;
+	}
 }

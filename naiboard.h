@@ -5,6 +5,7 @@
 
 void naiboard_readstatus(void);
 
+void naiboard_reset(void);
 void naiboard_delay_ms(uint16_t ms);
 void naiboard_delay_us(uint16_t us);
 

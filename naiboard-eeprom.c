@@ -5,6 +5,7 @@
 #include <avr/eeprom_driver.h>
 
 uint16_t naiboard_eeprom_readcounter(void) {
+	// TODO
 	return 0;
 }
 
