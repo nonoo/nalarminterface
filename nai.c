@@ -16,6 +16,8 @@
 #include <stdio.h>
 
 extern usb_buf_t naiboard_usb_sendbuf;
+extern uint8_t naiboard_eepromcounter_page;
+extern uint8_t naiboard_eepromcounter_addr;
 
 volatile nai_statusbyte_t nai_statusbyte;
 
@@ -27,7 +29,6 @@ static void nai_usbpacket_send(nai_usbpacket_t *cmd) {
 // This gets called when a USB packet is received
 void nai_usbpacket_received(nai_usbpacket_t *cmd) {
 	nai_usbpacket_t response;
-	uint16_t counter;
 
 	printf_P(PSTR("nai_usbpacket_received(): "));
 
@@ -47,8 +48,8 @@ void nai_usbpacket_received(nai_usbpacket_t *cmd) {
 			nai_usbpacket_send(&response);
 			break;
 		case NAI_USBPACKET_TYPE_GETEEPROMCOUNTER:
-			counter = naiboard_eeprom_readcounter();
-			memcpy(response.payload, &counter, 2);
+			response.payload[0] = naiboard_eepromcounter_page;
+			response.payload[1] = naiboard_eepromcounter_addr;
 			nai_usbpacket_send(&response);
 			break;
 		case NAI_USBPACKET_TYPE_CHECKBOARD:
@@ -102,7 +103,8 @@ void nai_processconsolecommand(char *buffer) {
 		return;
 	}
 	if (strcmp(tok, "ecp") == 0) {
-		printf_P(PSTR("eeprom counter: %d\n"), naiboard_eeprom_readcounter());
+		printf_P(PSTR("eeprom counter: page %d addr %d\n"),
+			naiboard_eepromcounter_page, naiboard_eepromcounter_addr);
 		return;
 	}
 }

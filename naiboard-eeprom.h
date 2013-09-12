@@ -3,7 +3,9 @@
 
 #include <stdint.h>
 
-uint16_t naiboard_eeprom_readcounter(void);
+void naiboard_eeprom_readcounter(void);
+uint8_t naiboard_eeprom_readstatusbyte(void);
+void naiboard_eeprom_writestatusbyte(uint8_t statusbyte);
 void naiboard_eeprom_init(void);
 
 #endif

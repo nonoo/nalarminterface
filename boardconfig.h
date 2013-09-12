@@ -3,6 +3,8 @@
 
 #undef F_CPU
 #define F_CPU					48000000UL
+#define EEPROMBYTESPERPAGE		16
+#define EEPROMPAGECOUNT			128
 #define RTCCALLPERSEC			10
 #define STDINBUFFERSIZE			25
 
