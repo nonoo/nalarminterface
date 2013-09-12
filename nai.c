@@ -60,12 +60,29 @@ void nai_usbpacket_received(nai_usbpacket_t *cmd) {
 
 void nai_process(void) {
 	if (nai_statusbyte.p1int || nai_statusbyte.p2int || nai_statusbyte.p3int || nai_statusbyte.p4int) {
+		naiboard_eeprom_writestatusbyte(*(uint8_t*)&nai_statusbyte);
 		// TODO
 	}
 }
 
 void nai_printvcc(void) {
 	printf_P(PSTR("vcc: %fV\n"), naiboard_get_vcc());
+}
+
+void nai_printeepromcounter(void) {
+	printf_P(PSTR("eeprom counter: page %d addr %d\n"),
+		naiboard_eepromcounter_page, naiboard_eepromcounter_addr);
+}
+
+static void nai_printstatusbyte(void) {
+	printf_P(PSTR("statusbyte: P1state - %d\n"), nai_statusbyte.p1state);
+	printf_P(PSTR("            P1int   - %d\n"), nai_statusbyte.p1int);
+	printf_P(PSTR("            P2state - %d\n"), nai_statusbyte.p2state);
+	printf_P(PSTR("            P2int   - %d\n"), nai_statusbyte.p2int);
+	printf_P(PSTR("            P3state - %d\n"), nai_statusbyte.p3state);
+	printf_P(PSTR("            P3int   - %d\n"), nai_statusbyte.p3int);
+	printf_P(PSTR("            P4state - %d\n"), nai_statusbyte.p4state);
+	printf_P(PSTR("            P4int   - %d\n"), nai_statusbyte.p4int);
 }
 
 void nai_processconsolecommand(char *buffer) {
@@ -92,19 +109,17 @@ void nai_processconsolecommand(char *buffer) {
 	}
 	if (strcmp(tok, "stp") == 0) {
 		naiboard_ports_readstatus();
-		printf_P(PSTR("statusbyte: P1state - %d\n"), nai_statusbyte.p1state);
-		printf_P(PSTR("            P1int   - %d\n"), nai_statusbyte.p1int);
-		printf_P(PSTR("            P2state - %d\n"), nai_statusbyte.p2state);
-		printf_P(PSTR("            P2int   - %d\n"), nai_statusbyte.p2int);
-		printf_P(PSTR("            P3state - %d\n"), nai_statusbyte.p3state);
-		printf_P(PSTR("            P3int   - %d\n"), nai_statusbyte.p3int);
-		printf_P(PSTR("            P4state - %d\n"), nai_statusbyte.p4state);
-		printf_P(PSTR("            P4int   - %d\n"), nai_statusbyte.p4int);
+		nai_printstatusbyte();
 		return;
 	}
 	if (strcmp(tok, "ecp") == 0) {
-		printf_P(PSTR("eeprom counter: page %d addr %d\n"),
-			naiboard_eepromcounter_page, naiboard_eepromcounter_addr);
+		nai_printeepromcounter();
 		return;
 	}
+}
+
+void nai_init(void) {
+	*(uint8_t*)&nai_statusbyte = naiboard_eeprom_readstatusbyte();
+	nai_printeepromcounter();
+	nai_printstatusbyte();
 }

@@ -18,6 +18,7 @@ int main() {
    	printf_P(PSTR("\n\n\nnonoo's alarm interface v%d.%d\n" \
    		"built: " __TIME__ " " __DATE__ "\nusb vid=%.4x pid=%.4x sn=" USB_DEVICE_SERIAL_NAME "\n\n"), USB_DEVICE_MAJOR_VERSION, USB_DEVICE_MINOR_VERSION, USB_DEVICE_VENDOR_ID, USB_DEVICE_PRODUCT_ID);
 	nai_printvcc();
+	nai_init();
 	printf_P(PSTR("ready.\n"));
 
 	while (1) {
