@@ -6,8 +6,8 @@
 typedef uint8_t flag_t;
 
 typedef struct {
-	uint8_t p1state : 1;
-	uint8_t p1int 	: 1;
+	uint8_t p1state : 1; // This is 1 if P1 is 1
+	uint8_t p1int 	: 1; // This is 1 if there was an interrupt on P1
 	uint8_t p2state : 1;
 	uint8_t p2int 	: 1;
 	uint8_t p3state : 1;

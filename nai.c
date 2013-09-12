@@ -6,6 +6,7 @@
 #include "naiboard-usb.h"
 #include "naiboard-adc.h"
 #include "naiboard-eeprom.h"
+#include "naiboard-ports.h"
 #include "naiboard.h"
 #include "types.h"
 
@@ -36,11 +37,12 @@ void nai_usbpacket_received(nai_usbpacket_t *cmd) {
 		case NAI_USBPACKET_TYPE_RESETINTERRUPTS:
 			nai_statusbyte.p1int = nai_statusbyte.p2int =
 				nai_statusbyte.p3int = nai_statusbyte.p4int = 0;
-			naiboard_readstatus();
+			naiboard_ports_readstatus();
 			response.payload[0] = *(uint8_t*)&nai_statusbyte;
 			nai_usbpacket_send(&response);
 			break;
 		case NAI_USBPACKET_TYPE_GETSTATUSBYTE:
+			naiboard_ports_readstatus();
 			response.payload[0] = *(uint8_t*)&nai_statusbyte;
 			nai_usbpacket_send(&response);
 			break;
@@ -55,10 +57,15 @@ void nai_usbpacket_received(nai_usbpacket_t *cmd) {
 	}
 }
 
+void nai_process(void) {
+	if (nai_statusbyte.p1int || nai_statusbyte.p2int || nai_statusbyte.p3int || nai_statusbyte.p4int) {
+		// TODO
+	}
+}
+
 void nai_printvcc(void) {
 	printf_P(PSTR("vcc: %fV\n"), naiboard_get_vcc());
 }
-
 
 void nai_processconsolecommand(char *buffer) {
 	char *tok;
@@ -83,6 +90,7 @@ void nai_processconsolecommand(char *buffer) {
 		return;
 	}
 	if (strcmp(tok, "stp") == 0) {
+		naiboard_ports_readstatus();
 		printf_P(PSTR("statusbyte: P1state - %d\n"), nai_statusbyte.p1state);
 		printf_P(PSTR("            P1int   - %d\n"), nai_statusbyte.p1int);
 		printf_P(PSTR("            P2state - %d\n"), nai_statusbyte.p2state);

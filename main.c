@@ -24,6 +24,7 @@ int main() {
 		WDT_Reset();
 //		naiboard_sleep();
 		naiboard_process_stdin();
+		nai_process();
 	}
 
     return 0;
