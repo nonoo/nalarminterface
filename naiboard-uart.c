@@ -27,7 +27,7 @@ static int naiboard_uart_getchar(FILE *stream) {
 	return USART_GetChar(&USARTMODULE);
 }
 
-flag_t naiboard_stdin_data_waiting(void) {
+static flag_t naiboard_stdin_data_waiting(void) {
 	return USART_IsRXComplete(&USARTMODULE);
 }
 

@@ -55,6 +55,11 @@ void nai_usbpacket_received(nai_usbpacket_t *cmd) {
 	}
 }
 
+void nai_printvcc(void) {
+	printf_P(PSTR("vcc: %fV\n"), naiboard_get_vcc());
+}
+
+
 void nai_processconsolecommand(char *buffer) {
 	char *tok;
 
@@ -74,7 +79,7 @@ void nai_processconsolecommand(char *buffer) {
 		return;
 	}
 	if (strcmp(tok, "vcp") == 0) {
-		printf_P(PSTR("vcc: %fV\n"), naiboard_get_vcc());
+		nai_printvcc();
 		return;
 	}
 	if (strcmp(tok, "stp") == 0) {
