@@ -5,19 +5,18 @@
 #include <avr/port_driver.h>
 
 static void naiboard_led1_init(void) {
-    LED1PORT.DIRSET = LED1PIN; // TODO
-    LED1PORT.OUTCLR = LED1PIN;
+	PORT_SetPinsAsOutput(&LED1PORT, LED1PIN);
+    naiboard_led1_off();
 }
 
 void naiboard_led1_on(void) {
-    LED1PORT.OUTCLR = LED1PIN;
+	PORT_ClearPins(&LED1PORT, LED1PIN);
 }
 
 void naiboard_led1_off(void) {
-    LED1PORT.OUTSET = LED1PIN;
+	PORT_SetPins(&LED1PORT, LED1PIN);
 }
 
 void naiboard_led_init(void) {
 	naiboard_led1_init();
-	naiboard_led1_off();
 }

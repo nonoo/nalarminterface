@@ -122,6 +122,14 @@ void naiboard_init(void) {
 	naiboard_led1_on();
 	naiboard_delay_ms(50);
 	naiboard_led1_off();
+	naiboard_delay_ms(50);
+	naiboard_led1_on();
+	naiboard_delay_ms(50);
+	naiboard_led1_off();
+	naiboard_delay_ms(50);
+	naiboard_led1_on();
+	naiboard_delay_ms(50);
+	naiboard_led1_off();
 
 	naiboard_rtc_init();
 }
