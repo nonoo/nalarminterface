@@ -4,6 +4,7 @@
 #undef F_CPU
 #define F_CPU					48000000UL
 #define RTCCALLPERSEC			10
+#define STDINBUFFERSIZE			25
 
 #define USB_VID					0x4566
 #define USB_PID					0x0000

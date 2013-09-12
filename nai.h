@@ -4,5 +4,6 @@
 #include "types.h"
 
 void nai_usbpacket_received(nai_usbpacket_t *cmd);
+void nai_processconsolecommand(char *cmd);
 
 #endif

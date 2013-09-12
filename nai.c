@@ -15,7 +15,7 @@
 
 extern usb_buf_t naiboard_usb_sendbuf;
 
-static volatile nai_statusbyte_t nai_statusbyte;
+volatile nai_statusbyte_t nai_statusbyte;
 
 static void nai_usbpacket_send(nai_usbpacket_t *cmd) {
 	memcpy(naiboard_usb_sendbuf, cmd, sizeof(nai_usbpacket_t));
@@ -35,7 +35,7 @@ void nai_usbpacket_received(nai_usbpacket_t *cmd) {
 		case NAI_USBPACKET_TYPE_RESETINTERRUPTS:
 			nai_statusbyte.p1int = nai_statusbyte.p2int =
 				nai_statusbyte.p3int = nai_statusbyte.p4int = 0;
-			naiboard_readstatus(&nai_statusbyte);
+			naiboard_readstatus();
 			response.payload[0] = *(uint8_t*)&nai_statusbyte;
 			nai_usbpacket_send(&response);
 			break;
@@ -52,4 +52,7 @@ void nai_usbpacket_received(nai_usbpacket_t *cmd) {
 			nai_usbpacket_send(&response);
 			break;
 	}
+}
+
+void nai_processconsolecommand(char *cmd) {
 }

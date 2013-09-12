@@ -1,6 +1,7 @@
 #include "boardconfig.h"
 
 #include "naiboard-uart.h"
+#include "nai.h"
 
 #include <avr/usart_driver.h>
 #include <avr/port_driver.h>
@@ -24,6 +25,45 @@ static int naiboard_uart_getchar(FILE *stream) {
 	while (!USART_IsRXComplete(&USARTMODULE))
 		;
 	return USART_GetChar(&USARTMODULE);
+}
+
+flag_t naiboard_stdin_data_waiting(void) {
+	return USART_IsRXComplete(&USARTMODULE);
+}
+
+void naiboard_process_stdin(void) {
+	char stdin_in;
+	static char stdin_buffer[STDINBUFFERSIZE];
+	static uint8_t stdin_bufferpos;
+
+	while (naiboard_stdin_data_waiting()) {
+		stdin_in = fgetc(stdin);
+
+		if (stdin_in == '\n' || (stdin_in == '\r' && stdin_bufferpos == 0)) {
+			printf_P(PSTR("\n"));
+			continue;
+		}
+
+		if (stdin_bufferpos+1 == STDINBUFFERSIZE && stdin_in != '\b' && stdin_in != 0x7f && stdin_in != '\r')
+			continue;
+
+		if (stdin_in == '\b' || stdin_in == 0x7f) { // 0x7f - backspace
+			printf_P(PSTR("%c %c"), stdin_in, stdin_in);
+			if (stdin_bufferpos > 0)
+				stdin_bufferpos--;
+			continue;
+		}
+
+		printf_P(PSTR("%c"), stdin_in);
+
+		if (stdin_in == '\r') {
+			printf_P(PSTR("\n"));
+			stdin_buffer[stdin_bufferpos] = 0;
+			stdin_bufferpos = 0;
+			nai_processconsolecommand(stdin_buffer);
+		} else
+			stdin_buffer[stdin_bufferpos++] = stdin_in;
+	}
 }
 
 void naiboard_uart_init(void) {
