@@ -46,10 +46,16 @@ hex: $(TARGET).hex
 %.o: %.c *.h avr/*.h %.S
 	$(CC) $(CFLAGS) -c $*.c -o $@
 
-writeflash: hex
-	$(AVRDUDE) -v -c $(AVRDUDE_PROGRAMMERID) -p $(AVRDUDEMCU) -P $(AVRDUDE_PORT) -e -U flash:w:$(TARGET).hex
+writeflash:
+	$(AVRDUDE) -c $(AVRDUDE_PROGRAMMERID) -p $(AVRDUDEMCU) -P $(AVRDUDE_PORT) -U flash:w:$(TARGET).hex -U eeprom:w:$(AVRDUDEMCU).eeprom.hex:i
 
-install: writeflash
+readeeprom:
+	$(AVRDUDE) -c $(AVRDUDE_PROGRAMMERID) -p $(AVRDUDEMCU) -P $(AVRDUDE_PORT) -U eeprom:r:$(AVRDUDEMCU).eeprom.hex:i
+
+erase:
+	$(AVRDUDE) -c $(AVRDUDE_PROGRAMMERID) -p $(AVRDUDEMCU) -P $(AVRDUDE_PORT) -e
+
+install: hex readeeprom erase writeflash
 
 clean:
 	rm -f $(MODULES:.S=.o) *.out *.hex *.lst *.out.map *.map $(TARGET) $(DEPFILE)

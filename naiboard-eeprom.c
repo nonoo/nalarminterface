@@ -4,6 +4,9 @@
 
 #include <avr/eeprom_driver.h>
 
+// Note: every value written and read to/from the EEPROM is negated,
+// because every byte is 0xff by factory default.
+
 #define EE_COUNTER_PAGE		0
 #define EE_COUNTER_PAGEVAL	0
 #define EE_COUNTER_ADDRVAL	1
@@ -12,13 +15,13 @@ uint8_t naiboard_eepromcounter_page;
 uint8_t naiboard_eepromcounter_addr;
 
 void naiboard_eeprom_readcounter(void) {
-	naiboard_eepromcounter_page = EEPROM_ReadByte(EE_COUNTER_PAGE, EE_COUNTER_PAGEVAL);
-	naiboard_eepromcounter_addr = EEPROM_ReadByte(EE_COUNTER_PAGE, EE_COUNTER_ADDRVAL);
+	naiboard_eepromcounter_page = ~EEPROM_ReadByte(EE_COUNTER_PAGE, EE_COUNTER_PAGEVAL);
+	naiboard_eepromcounter_addr = ~EEPROM_ReadByte(EE_COUNTER_PAGE, EE_COUNTER_ADDRVAL);
 }
 
 static void naiboard_eeprom_writecounter(void) {
-	EEPROM_WriteByte(EE_COUNTER_PAGE, EE_COUNTER_PAGEVAL, naiboard_eepromcounter_page);
-	EEPROM_WriteByte(EE_COUNTER_PAGE, EE_COUNTER_ADDRVAL, naiboard_eepromcounter_addr);
+	EEPROM_WriteByte(EE_COUNTER_PAGE, EE_COUNTER_PAGEVAL, ~naiboard_eepromcounter_page);
+	EEPROM_WriteByte(EE_COUNTER_PAGE, EE_COUNTER_ADDRVAL, ~naiboard_eepromcounter_addr);
 }
 
 static void naiboard_eeprom_increasecounter(void) {
@@ -34,16 +37,16 @@ static void naiboard_eeprom_increasecounter(void) {
 }
 
 uint8_t naiboard_eeprom_readstatusbyte(void) {
-	return EEPROM_ReadByte(naiboard_eepromcounter_page, naiboard_eepromcounter_addr);
+	return ~EEPROM_ReadByte(naiboard_eepromcounter_page, naiboard_eepromcounter_addr);
 }
 
 void naiboard_eeprom_writestatusbyte(uint8_t statusbyte) {
-	EEPROM_WriteByte(naiboard_eepromcounter_page, naiboard_eepromcounter_addr, statusbyte);
+	EEPROM_WriteByte(naiboard_eepromcounter_page, naiboard_eepromcounter_addr, ~statusbyte);
 
 	if (naiboard_eeprom_readstatusbyte() != statusbyte) { // If the read back value is not correct
 		naiboard_eeprom_increasecounter();
 		// Trying writing again to a different EEPROM byte
-		EEPROM_WriteByte(naiboard_eepromcounter_page, naiboard_eepromcounter_addr, statusbyte);
+		EEPROM_WriteByte(naiboard_eepromcounter_page, naiboard_eepromcounter_addr, ~statusbyte);
 	}
 }
 
