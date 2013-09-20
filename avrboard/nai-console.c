@@ -77,4 +77,5 @@ void nai_console_processcommand(char *buffer) {
 		nai_console_printcurrenttime();
 		return;
 	}
+	printf(PSTR("unknown command, use help.\n"));
 }
