@@ -10,36 +10,30 @@
 #include <stdio.h>
 
 static int naiboard_uart_putchar(char c, FILE *stream);
-static int naiboard_uart_getchar(FILE *stream);
-static FILE mystdout = FDEV_SETUP_STREAM(naiboard_uart_putchar, naiboard_uart_getchar, _FDEV_SETUP_RW);
+static FILE mystdout = FDEV_SETUP_STREAM(naiboard_uart_putchar, NULL, _FDEV_SETUP_WRITE);
 
+static USART_data_t naiboard_uart;
+
+// We don't use the USART driver's built-in ring buffer because the function gets called
+// as an interrupt, so if the buffer is full and we block here, no output will be printed.
 static int naiboard_uart_putchar(char c, FILE *stream) {
     if (c == '\n')
 		naiboard_uart_putchar('\r', stream);
+
 	while (!USART_IsTXDataRegisterEmpty(&USARTMODULE))
 		;
 	USART_PutChar(&USARTMODULE, c);
+
 	return 0;
 }
 
-static int naiboard_uart_getchar(FILE *stream) {
-	while (!USART_IsRXComplete(&USARTMODULE))
-		;
-	return USART_GetChar(&USARTMODULE);
-}
-
-static flag_t naiboard_stdin_data_waiting(void) {
-	return USART_IsRXComplete(&USARTMODULE);
-}
-
 void naiboard_process_stdin(void) {
-	char stdin_in;
+	uint8_t stdin_in;
 	static char stdin_buffer[STDINBUFFERSIZE];
 	static uint8_t stdin_bufferpos;
 
-	while (naiboard_stdin_data_waiting()) {
-		stdin_in = fgetc(stdin);
-
+	while (USART_RXBufferData_Available(&naiboard_uart)) {
+		stdin_in = USART_RXBuffer_GetByte(&naiboard_uart);
 		if (stdin_in == '\n' || (stdin_in == '\r' && stdin_bufferpos == 0)) {
 			printf_P(PSTR("\n"));
 			continue;
@@ -67,15 +61,26 @@ void naiboard_process_stdin(void) {
 	}
 }
 
+ISR(USARTMODULEDREINTVECT) {
+	USART_DataRegEmpty(&naiboard_uart);
+}
+
+ISR(USARTMODULERXCINTVECT) {
+	USART_RXComplete(&naiboard_uart);
+}
+
 void naiboard_uart_init(void) {
 	sysclk_enable_peripheral_clock(&USARTMODULE);
     stdout = &mystdout;
-    stdin = &mystdout;
 
 	PORT_SetPinsAsOutput(&USARTPORT, USARTTXPIN);
 	PORT_ConfigurePins(&USARTPORT, USARTTXPIN, false, false, PORT_OPC_WIREDANDPULL_gc, PORT_ISC_INPUT_DISABLE_gc);
 	PORT_SetPinsAsInput(&USARTPORT, USARTRXPIN);
 	PORT_ConfigurePins(&USARTPORT, USARTRXPIN, false, false, PORT_OPC_PULLDOWN_gc, PORT_ISC_FALLING_gc);
+
+	USART_InterruptDriver_Initialize(&naiboard_uart, &USARTMODULE, USART_DREINTLVL_LO_gc);
+	USART_RxdInterruptLevel_Set(&USARTMODULE, USART_RXCINTLVL_LO_gc);
+
 	USART_Format_Set(&USARTMODULE, USART_CHSIZE_8BIT_gc, USART_PMODE_DISABLED_gc, false);
 	USART_Baudrate_Set(&USARTMODULE, 1603, -6); // 48MHz, 115200bps
 	USART_Rx_Enable(&USARTMODULE);

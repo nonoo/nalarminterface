@@ -13,6 +13,8 @@
 #define USB_PID							0x0000
 
 #define USARTMODULE						USARTE0
+#define USARTMODULERXCINTVECT			USARTE0_RXC_vect
+#define USARTMODULEDREINTVECT			USARTE0_DRE_vect
 #define USARTPORT						PORTE
 #define USARTRXPIN						PIN2_bm
 #define USARTTXPIN						PIN3_bm
