@@ -1,7 +1,8 @@
 #include "boardconfig.h"
 
 #include "naiboard-uart.h"
-#include "nai.h"
+#include "nai-console.h"
+#include "types.h"
 
 #include <avr/usart_driver.h>
 #include <avr/port_driver.h>
@@ -60,7 +61,7 @@ void naiboard_process_stdin(void) {
 			printf_P(PSTR("\n"));
 			stdin_buffer[stdin_bufferpos] = 0;
 			stdin_bufferpos = 0;
-			nai_processconsolecommand(stdin_buffer);
+			nai_console_processcommand(stdin_buffer);
 		} else
 			stdin_buffer[stdin_bufferpos++] = stdin_in;
 	}

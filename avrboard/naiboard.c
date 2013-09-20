@@ -41,6 +41,7 @@ void naiboard_delay_us(uint16_t us) {
 void naiboard_sleep(void) {
 	if (naiboard_state.usb_vendor_enabled)
 		return;
+
 	SLEEP.CTRL = SLEEP_SMODE_IDLE_gc;
 
 	sysclk_disable_peripheral_clock(&RTC);

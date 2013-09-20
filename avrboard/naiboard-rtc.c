@@ -7,6 +7,8 @@
 #include <avr/sysclk.h>
 #include <avr/rtc_driver.h>
 
+volatile timestamp_t naiboard_time;
+
 // Period == 1024 -> 1 sec resolution
 void naiboard_rtc_init(void) {
 	sysclk_enable_peripheral_clock(&RTC);
@@ -36,6 +38,8 @@ void naiboard_rtc_init(void) {
 
 ISR(RTC_OVF_vect) {
 	extern volatile naiboard_state_t naiboard_state;
+
+	naiboard_time++;
 
 	if (naiboard_state.usb_blinkrxtxledpulsecount) {
 		if (naiboard_state.usb_ledstate)

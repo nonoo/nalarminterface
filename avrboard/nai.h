@@ -5,8 +5,6 @@
 
 void nai_usbpacket_received(nai_usbpacket_t *cmd);
 void nai_process(void);
-void nai_printvcc(void);
-void nai_processconsolecommand(char *cmd);
 void nai_init(void);
 
 #endif

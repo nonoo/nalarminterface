@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 typedef uint8_t flag_t;
+typedef uint8_t timestamp_t;
 
 typedef struct {
 	uint8_t p1state : 1; // This is 1 if P1 is 1
@@ -15,6 +16,10 @@ typedef struct {
 	uint8_t p4state : 1;
 	uint8_t p4int 	: 1;
 } nai_statusbyte_t;
+
+typedef struct {
+	uint8_t eepromupdated : 1;
+} nai_flags_t;
 
 #define NAI_USBPACKET_TYPE_RESETINTERRUPTS	0
 #define NAI_USBPACKET_TYPE_GETSTATUSBYTE	1

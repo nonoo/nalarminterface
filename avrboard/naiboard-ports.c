@@ -5,6 +5,7 @@
 #include <avr/port_driver.h>
 
 extern volatile nai_statusbyte_t nai_statusbyte;
+extern volatile nai_flags_t nai_flags;
 
 void naiboard_ports_readstatus(void) {
 	nai_statusbyte.p1state = (PORT_GetPortValue(&P1PORT) & P1PIN) ? 1 : 0;
@@ -33,13 +34,17 @@ void naiboard_ports_init(void) {
 // These are the interrupt handlers for the watched pins
 ISR(P1INTVECT) {
 	nai_statusbyte.p1int = 1;
+	nai_flags.eepromupdated = 0;
 }
 ISR(P2INTVECT) {
 	nai_statusbyte.p2int = 1;
+	nai_flags.eepromupdated = 0;
 }
 ISR(P3INTVECT) {
 	nai_statusbyte.p3int = 1;
+	nai_flags.eepromupdated = 0;
 }
 ISR(P4INTVECT) {
 	nai_statusbyte.p4int = 1;
+	nai_flags.eepromupdated = 0;
 }

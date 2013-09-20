@@ -4,6 +4,8 @@
 
 #include <avr/eeprom_driver.h>
 
+#include <stdio.h>
+
 // Note: every value written and read to/from the EEPROM is negated,
 // because every byte is 0xff by factory default.
 
@@ -25,6 +27,8 @@ static void naiboard_eeprom_writecounter(void) {
 }
 
 static void naiboard_eeprom_increasecounter(void) {
+	printf_P(PSTR("naiboard-eeprom: increasing eeprom counter.\n"));
+
 	naiboard_eepromcounter_addr++;
 	if (naiboard_eepromcounter_addr >= EEPROMBYTESPERPAGE) { // Max. this many bytes per page
 		naiboard_eepromcounter_addr = 0;
@@ -41,6 +45,9 @@ uint8_t naiboard_eeprom_readstatusbyte(void) {
 }
 
 void naiboard_eeprom_writestatusbyte(uint8_t statusbyte) {
+	if (naiboard_eeprom_readstatusbyte() == statusbyte) // Not updating if not necessary
+		return;
+
 	EEPROM_WriteByte(naiboard_eepromcounter_page, naiboard_eepromcounter_addr, ~statusbyte);
 
 	if (naiboard_eeprom_readstatusbyte() != statusbyte) { // If the read back value is not correct

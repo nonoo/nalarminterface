@@ -16,6 +16,7 @@ AVRDUDE_PORT=usb
 
 CC=avr-gcc
 AS=avr-as
+STRIP=avr-strip
 OBJCOPY=avr-objcopy
 OBJDUMP=avr-objdump
 SIZE=avr-size
@@ -35,6 +36,7 @@ DEPFILE := $(TARGET).dep
 
 $(TARGET): $(DEPFILE) $(MODULES)
 	$(CC) $(LDFLAGS) -o $(TARGET) -Wl,--start-group $(MODULES) -Wl,--end-group
+	$(STRIP) $(TARGET)
 
 $(DEPFILE): $(SOURCES)
 	$(CC) $(CFLAGS) -MM $(SOURCES) > $(DEPFILE)
@@ -68,4 +70,4 @@ clean:
 
 stats: $(TARGET)
 	$(OBJDUMP) -h $(TARGET)
-	$(SIZE) $(TARGET)
+	$(SIZE) --mcu=$(MCU) -C $(TARGET)
