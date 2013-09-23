@@ -1,2 +1,0 @@
-- sending the status byte every 100ms until it's been reset
-- status byte reset usb command
