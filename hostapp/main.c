@@ -64,6 +64,8 @@ int main(int argc, char **argv) {
 	if (!usb_init())
 		return 1;
 
+	daemon_init();
+
 	if (daemonize)
 		daemon_daemonize();
 

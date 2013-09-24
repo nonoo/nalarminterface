@@ -9,6 +9,11 @@ void daemon_daemonize(void) {
 
 void daemon_process(void) {
 	// TODO
+	daemon_poll_process();
+}
+
+void daemon_init(void) {
+	daemon_poll_init();
 }
 
 void daemon_deinit(void) {
