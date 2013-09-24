@@ -7,10 +7,9 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <ctype.h>
-#include <libusb-1.0/libusb.h>
 #include <errno.h>
-#include <stdint.h>
 #include <stdlib.h>
+#include <signal.h>
 
 #define VERSION "0.1"
 
@@ -58,7 +57,38 @@ static void processcommandline(int argc, char **argv) {
 	}
 }
 
+static void sighandler(int signal) {
+	switch (signal) {
+		case SIGHUP:
+			printf("main: got SIGHUP.\n");
+			if (!config_init(configfilename))
+				nai_flags.sigexit = 1;
+			break;
+		case SIGINT:
+			if (nai_flags.sigexit) {
+				printf("main: got SIGINT again, exiting.\n");
+				exit(0);
+			}
+			printf("main: got SIGINT.\n");
+			nai_flags.sigexit = 1;
+			break;
+		case SIGTERM:
+			if (nai_flags.sigexit) {
+				printf("main: got SIGTERM again, exiting.\n");
+				exit(0);
+			}
+			printf("main: got SIGTERM.\n");
+			nai_flags.sigexit = 1;
+			break;
+	}
+}
+
 int main(int argc, char **argv) {
+	signal(SIGHUP, sighandler);
+	signal(SIGINT, sighandler);
+	signal(SIGTERM, sighandler);
+	signal(SIGPIPE, SIG_IGN);
+
 	processcommandline(argc, argv);
 
 	if (!config_init(configfilename))
@@ -80,6 +110,7 @@ int main(int argc, char **argv) {
 
 	usb_deinit();
 	daemon_poll_deinit();
+	config_deinit();
 
 	return 0;
 }
