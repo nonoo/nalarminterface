@@ -6,11 +6,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define CHECKBOARDTIMEOUTINSEC		3
-#define CHECKBOARDSENDPERIODINSEC	15
+#define CHECKBOARDTIMEOUTINSEC			3
+#define CHECKBOARDSENDPERIODINSEC		15
+#define CHECKEEPROMCOUNTERPERIODINSEC	30
 
 static time_t nai_checkboardsentat = 0;
 static time_t nai_gotcheckboardat = 0;
+static time_t nai_geteepromcountersentat = 0;
 static flag_t nai_connected = 0;
 
 void nai_getstatusbyte(void) {
@@ -29,6 +31,7 @@ void nai_geteepromcounter(void) {
 
 	usbpacket.type = NAI_USBPACKET_TYPE_GETEEPROMCOUNTER;
 	usb_send_naipacket(&usbpacket);
+	nai_geteepromcountersentat = time(NULL);
 }
 
 void nai_resetinterrupts(void) {
@@ -108,7 +111,8 @@ void nai_usb_packet_received_cb(nai_usbpacket_t *usbpacket) {
 					nai_eepromcounterhasincreased(usbpacket->payload[0], usbpacket->payload[1]);
 					config_set_eepromcounter_page(usbpacket->payload[0]);
 					config_set_eepromcounter_address(usbpacket->payload[1]);
-				}
+				} else
+					printf("nai: eeprom counter check ok.\n");
 			break;
 		case NAI_USBPACKET_TYPE_GETSTATUSBYTE | NAI_USBPACKET_TYPE_RESPONSE:
 			printf("nai: received get status byte response.\n");
@@ -138,6 +142,10 @@ flag_t nai_process(void) {
 				printf("nai: periodic board check timeout.\n");
 				nai_checkboard();
 			}
+		}
+		if (time(NULL) - nai_geteepromcountersentat > CHECKEEPROMCOUNTERPERIODINSEC) {
+			printf("nai: check eeprom counter timeout.\n");
+			nai_geteepromcounter();
 		}
 	}
 

@@ -112,5 +112,7 @@ int main(int argc, char **argv) {
 	daemon_poll_deinit();
 	config_deinit();
 
+	printf("main: exiting.\n");
+
 	return 0;
 }

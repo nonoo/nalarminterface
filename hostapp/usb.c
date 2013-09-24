@@ -157,6 +157,7 @@ static libusb_device_handle* usb_open(int vid, int pid) {
 		probe_usbdev = usbdevlist[i];
 		r = libusb_get_device_descriptor(probe_usbdev, &desc);
 		if (r >= 0 && desc.idVendor == vid && desc.idProduct == pid) {
+			usleep(1000);
 			r = libusb_open(probe_usbdev, &probe_usbdevh);
 			if (r == 0) {
 				printf("usb: device found and opened.\n");
