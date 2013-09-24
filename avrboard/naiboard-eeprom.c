@@ -9,9 +9,13 @@
 // Note: every value written and read to/from the EEPROM is negated,
 // because every byte is 0xff by factory default.
 
-#define EE_COUNTER_PAGE		0
-#define EE_COUNTER_PAGEVAL	0
-#define EE_COUNTER_ADDRVAL	1
+#define EE_COUNTER_PAGE			0
+#define EE_COUNTER_PAGEVAL		0
+#define EE_COUNTER_ADDRVAL		1
+
+// These will be the default init values
+#define EE_COUNTER_INIT_PAGE	0
+#define EE_COUNTER_INIT_ADDR	2
 
 uint8_t naiboard_eepromcounter_page;
 uint8_t naiboard_eepromcounter_addr;
@@ -62,4 +66,12 @@ void naiboard_eeprom_init(void) {
 	EEPROM_DisableMapping();
 
 	naiboard_eeprom_readcounter();
+
+	if (naiboard_eepromcounter_page == EE_COUNTER_PAGE &&
+		(naiboard_eepromcounter_addr == EE_COUNTER_PAGEVAL ||
+		naiboard_eepromcounter_addr == EE_COUNTER_ADDRVAL)) {
+			naiboard_eepromcounter_page = EE_COUNTER_INIT_PAGE;
+			naiboard_eepromcounter_addr = EE_COUNTER_INIT_ADDR;
+			naiboard_eeprom_writecounter();
+	}
 }

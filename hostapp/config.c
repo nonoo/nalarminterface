@@ -119,7 +119,7 @@ int config_get_eepromcounter_page(void) {
 	if (error) {
 		fprintf(stderr, "config: no \"eepromcounter-page\" setting found in config file, using default.\n");
 		g_key_file_set_integer(keyfile, "main", "eepromcounter-page", 0);
-		val = 1;
+		val = 0;
 	}
 	printf("config: read \"eepromcounter-page\" setting: %d\n", val);
 	return val;
@@ -135,8 +135,8 @@ int config_get_eepromcounter_address(void) {
 	int val = g_key_file_get_integer(keyfile, "main", "eepromcounter-address", &error);
 	if (error) {
 		fprintf(stderr, "config: no \"eepromcounter-address\" setting found in config file, using default.\n");
-		g_key_file_set_integer(keyfile, "main", "eepromcounter-address", 0);
-		val = 1;
+		g_key_file_set_integer(keyfile, "main", "eepromcounter-address", 2);
+		val = 2;
 	}
 	printf("config: read \"eepromcounter-address\" setting: %d\n", val);
 	return val;
