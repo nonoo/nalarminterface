@@ -49,9 +49,9 @@ static void LIBUSB_CALL usb_send_int_cb(struct libusb_transfer *transfer) {
 }
 
 void usb_send_int(uint8_t *data, int length) {
-	struct libusb_transfer *transfer;
-	uint8_t *intbuf;
-	int i;
+	struct libusb_transfer *transfer = NULL;
+	uint8_t *intbuf = NULL;
+	int i = 0;
 
 	if (!usb_state.connected) {
 		printf("usb: can't send int packet, interface not connected.\n");
@@ -90,6 +90,19 @@ void usb_send_int(uint8_t *data, int length) {
 		printf("usb: int transfer submitted.\n");
 }
 
+static void usb_packet_received_cb(nai_usbpacket_t *usbpacket) {
+	switch (usbpacket->type) {
+		case NAI_USBPACKET_TYPE_CHECKBOARD | NAI_USBPACKET_TYPE_RESPONSE:
+			printf("usb: received checkboard response.\n");
+			if (!usb_state.connected) {
+				printf("usb: interface is now connected.\n");
+				usb_state.connected = 1;
+				nai_usb_connected_cb();
+			}
+			break;
+	}
+}
+
 static void LIBUSB_CALL usb_receive_int_cb(struct libusb_transfer *transfer) {
 	printf("usb: int received, transfer status: ");
 	switch (transfer->status) {
@@ -115,6 +128,8 @@ static void LIBUSB_CALL usb_receive_int_cb(struct libusb_transfer *transfer) {
 
 	if (transfer->actual_length == sizeof(nai_usbpacket_t)) {
 		// Handling connection-specific commands
+		usb_packet_received_cb((nai_usbpacket_t *)transfer->buffer);
+		// Passing other commands to the upper layer
 		nai_usb_packet_received_cb((nai_usbpacket_t *)transfer->buffer);
 	}
 
@@ -130,7 +145,7 @@ static void LIBUSB_CALL usb_receive_int_cb(struct libusb_transfer *transfer) {
 static libusb_device_handle* usb_open(int vid, int pid) {
 	libusb_device **usbdevlist = NULL;
 	int i = 0, r = 0;
-	struct libusb_device_descriptor desc;
+	struct libusb_device_descriptor desc = {0};
 	int usbdevcount = 0;
 	struct libusb_device_handle *probe_usbdevh = NULL;
 	libusb_device *probe_usbdev = NULL;
@@ -159,7 +174,7 @@ static libusb_device_handle* usb_open(int vid, int pid) {
 }
 
 static flag_t usb_initreceivecallback(void) {
-	static uint8_t usb_intinbuf[sizeof(nai_usbpacket_t)];
+	static uint8_t usb_intinbuf[sizeof(nai_usbpacket_t)] = {0};
 
 	usb_int_transfer = libusb_alloc_transfer(0);
 	if (!usb_int_transfer)
@@ -259,18 +274,20 @@ flag_t usb_init() {
 		libusb_free_config_descriptor(config);
 		config = NULL;
 	}
-	usb_state.initfinished = 1;
 
 	if (!usb_initreceivecallback()) {
 		fprintf(stderr, "usb error: can't initialize int receive callback.\n");
 		usb_deinit();
 		return 0;
 	}
+
+	usb_state.initfinished = 1;
+	printf("usb: interface opened and configured.\n");
 	return 1;
 }
 
 void usb_deinit() {
-	struct timeval tv;
+	struct timeval tv = {0};
 
 	printf("usb: deinit.\n");
 
@@ -311,5 +328,11 @@ void usb_deinit() {
 }
 
 void usb_process(void) {
-	// TODO
+	nai_usbpacket_t usbpacket = {0};
+
+	if (!usb_state.connected && !usb_state.checkboardsent && usb_state.initfinished) {
+		usbpacket.type = NAI_USBPACKET_TYPE_CHECKBOARD;
+		usb_send_int((uint8_t *)&usbpacket, sizeof(nai_usbpacket_t));
+		usb_state.checkboardsent = 1;
+	}
 }
