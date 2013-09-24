@@ -88,9 +88,9 @@ char* config_get_runonalarm(void) {
 	char *res = g_key_file_get_string(keyfile, "main", "runonalarm", &error);
 	if (error) {
 		fprintf(stderr, "config: no \"runonalarm\" setting found in config file, using default.\n");
-		res = (char*)malloc(12);
+		res = (char*)malloc(14);
 		if (res) {
-			snprintf(res, 12, "naialarm.sh");
+			snprintf(res, 14, "./naialarm.sh");
 			g_key_file_set_string(keyfile, "main", "runonalarm", res);
 		}
 	}
@@ -103,9 +103,9 @@ char* config_get_runoneepromcounterincrease(void) {
 	char *res = g_key_file_get_string(keyfile, "main", "runoneepromcounterincrease", &error);
 	if (error) {
 		fprintf(stderr, "config: no \"runoneepromcounterincrease\" setting found in config file, using default.\n");
-		res = (char*)malloc(16);
+		res = (char*)malloc(18);
 		if (res) {
-			snprintf(res, 16, "naieepromerr.sh");
+			snprintf(res, 18, "./naieepromerr.sh");
 			g_key_file_set_string(keyfile, "main", "runoneepromcounterincrease", res);
 		}
 	}
