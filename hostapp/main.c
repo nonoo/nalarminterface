@@ -70,7 +70,8 @@ int main(int argc, char **argv) {
 		daemon_daemonize();
 
 	while (!nai_flags.sigexit) {
-		usb_process();
+		if (!usb_process())
+			break;
 		daemon_process();
 	}
 

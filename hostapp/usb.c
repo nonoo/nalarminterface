@@ -2,7 +2,6 @@
 #include "daemon-poll.h"
 #include "nai.h"
 
-#include "../common/usbprotocol.h"
 #include "../avrboard/boardconfig.h"
 
 #include <libusb-1.0/libusb.h>
@@ -26,7 +25,7 @@ static struct {
 } usb_state = {0};
 
 static libusb_context *usb_ctx = NULL;
-static libusb_device_handle *usb_devh = NULL;
+static struct libusb_device_handle *usb_devh = NULL;
 static struct libusb_transfer *usb_int_transfer = NULL;
 
 static void LIBUSB_CALL usb_send_int_cb(struct libusb_transfer *transfer) {
@@ -48,15 +47,10 @@ static void LIBUSB_CALL usb_send_int_cb(struct libusb_transfer *transfer) {
 	printf("usb: sending int transfer completed.\n");
 }
 
-void usb_send_int(uint8_t *data, int length) {
+static void usb_send_int(uint8_t *data, int length) {
 	struct libusb_transfer *transfer = NULL;
 	uint8_t *intbuf = NULL;
 	int i = 0;
-
-	if (!usb_state.connected) {
-		printf("usb: can't send int packet, interface not connected.\n");
-		return;
-	}
 
 	printf("usb: sending int (length: %d): ", length);
 	for (i = 0; i < length; i++)
@@ -88,6 +82,14 @@ void usb_send_int(uint8_t *data, int length) {
 		usb_state.error = 1;
 	} else
 		printf("usb: int transfer submitted.\n");
+}
+
+void usb_send_naipacket(nai_usbpacket_t *usbpacket) {
+	if (!usb_state.connected) {
+		printf("usb: can't send nai packet, interface not connected.\n");
+		return;
+	}
+	usb_send_int((uint8_t *)usbpacket, sizeof(nai_usbpacket_t));
 }
 
 static void usb_packet_received_cb(nai_usbpacket_t *usbpacket) {
@@ -202,6 +204,7 @@ flag_t usb_init() {
 
 	memset(&usb_state, 0, sizeof(usb_state));
 
+	printf("usb: initializing libusb.\n");
 	int r = libusb_init(&usb_ctx);
 	if (r < 0) {
 		fprintf(stderr, "usb error: libusb init error.\n");
@@ -210,10 +213,12 @@ flag_t usb_init() {
 	}
 
 	libusb_set_debug(usb_ctx, 3);
+	printf("usb: setting poll fd notifiers.\n");
 	libusb_set_pollfd_notifiers(usb_ctx, usb_pollfd_added_cb, usb_pollfd_removed_cb, NULL);
 
+	printf("usb: opening device.\n");
 	if ((usb_devh = usb_open(USB_VID, USB_PID)) == NULL) {
-		fprintf(stderr, "usb error: can't open device after reenumeration.\n");
+		fprintf(stderr, "usb error: can't open device.\n");
 		usb_deinit();
 		return 0;
 	}
@@ -230,8 +235,11 @@ flag_t usb_init() {
 		}
 	}
 
-	if (libusb_kernel_driver_active(usb_devh, 0))
+	if (libusb_kernel_driver_active(usb_devh, 0)) {
+		printf("usb: detaching kernel driver.\n");
 		libusb_detach_kernel_driver(usb_devh, 0);
+	}
+	printf("usb: setting configuration 1.\n");
 	r = libusb_set_configuration(usb_devh, 1);
 	if (r < 0) {
 		fprintf(stderr, "usb error: set configuration error.\n");
@@ -239,6 +247,7 @@ flag_t usb_init() {
 		return 0;
 	}
 
+	printf("usb: claiming interface.\n");
 	r = libusb_claim_interface(usb_devh, 0);
 	if (r < 0) {
 		fprintf(stderr, "usb error: claim interface error.\n");
@@ -247,6 +256,7 @@ flag_t usb_init() {
 	}
 	usb_state.claimed = 1;
 
+	printf("usb: getting active config descriptor.\n");
 	r = libusb_get_active_config_descriptor(libusb_get_device(usb_devh), &config);
 	if (r < 0) {
 		if (config) {
@@ -258,6 +268,7 @@ flag_t usb_init() {
 		return 0;
 	}
 
+	printf("usb: setting interface alt setting.\n");
 	if (config->interface->num_altsetting != 1) {
 		r = libusb_set_interface_alt_setting(usb_devh, 0, 1);
 		if (r < 0) {
@@ -275,6 +286,7 @@ flag_t usb_init() {
 		config = NULL;
 	}
 
+	printf("usb: initializing int receive transfer and callback.\n");
 	if (!usb_initreceivecallback()) {
 		fprintf(stderr, "usb error: can't initialize int receive callback.\n");
 		usb_deinit();
@@ -327,12 +339,31 @@ void usb_deinit() {
 	printf("usb: deinit finished.\n");
 }
 
-void usb_process(void) {
+flag_t usb_process(void) {
 	nai_usbpacket_t usbpacket = {0};
+	struct timeval tv = {0};
+
+	if (usb_state.error)
+		return 0;
 
 	if (!usb_state.connected && !usb_state.checkboardsent && usb_state.initfinished) {
+		printf("usb: interface initialized, sending checkboard command.\n");
 		usbpacket.type = NAI_USBPACKET_TYPE_CHECKBOARD;
 		usb_send_int((uint8_t *)&usbpacket, sizeof(nai_usbpacket_t));
 		usb_state.checkboardsent = 1;
 	}
+
+	if (usb_state.initfinished) {
+		tv.tv_sec = tv.tv_usec = 0;
+		int r = libusb_handle_events_timeout(usb_ctx, &tv);
+		if (r < 0) {
+			fprintf(stderr, "usb error: libusb handle events error.\n");
+			usb_state.error = 1;
+			return 0;
+		}
+		if (libusb_get_next_timeout(usb_ctx, &tv))
+			daemon_poll_setmaxtimeout(tv.tv_sec * 1000 + tv.tv_usec / 1000.0);
+	}
+
+	return 1;
 }

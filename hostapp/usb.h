@@ -2,10 +2,11 @@
 #define USB_H_
 
 #include "types.h"
+#include "../common/usbprotocol.h"
 
-void usb_send_int(uint8_t *data, int length);
+void usb_send_naipacket(nai_usbpacket_t *usbpacket);
 flag_t usb_init();
 void usb_deinit();
-void usb_process(void);
+flag_t usb_process(void);
 
 #endif
