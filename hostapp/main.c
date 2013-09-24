@@ -1,5 +1,7 @@
 #include "daemon-poll.h"
 #include "usb.h"
+#include "config.h"
+#include "nai.h"
 #include "types.h"
 
 #include <stdio.h>
@@ -13,22 +15,23 @@
 #define VERSION "0.1"
 
 nai_flags_t nai_flags = {0};
+static char *configfilename = "nai.conf";
 
 static void printversion(void) {
-	printf("nalarminterface v" VERSION "\n");
-	printf("built: " __TIME__ " " __DATE__ "\n");
+	printf("nalarminterface v" VERSION " built: " __TIME__ " " __DATE__ "\n");
 }
 
 static void printusage(void) {
 	printversion();
 	printf("usage: -h         - this help\n");
 	printf("       -v         - print version\n");
+	printf("       -c [file]  - use config file \"file\"\n");
 }
 
 static void processcommandline(int argc, char **argv) {
 	int r;
 
-	while ((r = getopt(argc, argv, "hv")) != -1) {
+	while ((r = getopt(argc, argv, "hvc:")) != -1) {
 		switch (r) {
 			case 'v':
 				printversion();
@@ -36,6 +39,9 @@ static void processcommandline(int argc, char **argv) {
 			case 'h':
 				printusage();
 				exit(0);
+				break;
+			case 'c':
+				configfilename = optarg;
 				break;
 			default:
 				if (isprint(optopt))
@@ -55,6 +61,9 @@ static void processcommandline(int argc, char **argv) {
 int main(int argc, char **argv) {
 	processcommandline(argc, argv);
 
+	if (!config_init(configfilename))
+		return 1;
+
 	if (!usb_init())
 		return 1;
 
@@ -64,6 +73,8 @@ int main(int argc, char **argv) {
 		if (!usb_process())
 			break;
 		if (!daemon_poll_process())
+			break;
+		if (!nai_process())
 			break;
 	}
 

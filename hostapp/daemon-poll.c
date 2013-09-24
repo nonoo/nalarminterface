@@ -113,12 +113,12 @@ flag_t daemon_poll_isfdwritable(int fd) {
 }
 
 flag_t daemon_poll_process(void) {
-	printf("daemon-poll: calling poll() on %d fds, timeout: %d ms.\n", pfdcount, polltimeout);
+//	printf("daemon-poll: calling poll() on %d fds, timeout: %d ms.\n", pfdcount, polltimeout);
 	if (poll(pfd, pfdcount, polltimeout) < 0) {
 		fprintf(stderr, "daemon-poll: poll() error.\n");
 		return 0;
 	}
-	printf("daemon-poll: poll() exited, continuing execution.\n");
+//	printf("daemon-poll: poll() exited, continuing execution.\n");
 
 	// Setting a default poll timeout, this can be overridden once at a time by daemon_set_max_polltimeout()
 	polltimeout = 100;
