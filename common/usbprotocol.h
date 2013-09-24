@@ -1,6 +1,17 @@
 #ifndef USBPROTOCOL_H_
 #define USBPROTOCOL_H_
 
+typedef struct {
+	uint8_t p1state : 1; // This is 1 if P1 is 1
+	uint8_t p1int 	: 1; // This is 1 if there was an interrupt on P1
+	uint8_t p2state : 1;
+	uint8_t p2int 	: 1;
+	uint8_t p3state : 1;
+	uint8_t p3int 	: 1;
+	uint8_t p4state : 1;
+	uint8_t p4int 	: 1;
+} nai_statusbyte_t;
+
 #define NAI_USBPACKET_TYPE_RESETINTERRUPTS	0
 #define NAI_USBPACKET_TYPE_GETSTATUSBYTE	1
 #define NAI_USBPACKET_TYPE_GETEEPROMCOUNTER	2
