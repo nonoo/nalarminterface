@@ -12,11 +12,6 @@
 
 #define VERSION "0.1"
 
-#define USB_VID 0x4566
-#define USB_PID 0x0000
-
-#define USBTIMEOUTINMS 1000
-
 static int daemonize = 1;
 
 nai_flags_t nai_flags = {0};
@@ -66,11 +61,15 @@ static void processcommandline(int argc, char **argv) {
 int main(int argc, char **argv) {
 	processcommandline(argc, argv);
 
+	if (!usb_init())
+		return 1;
+
 	if (daemonize)
 		daemon_daemonize();
 
 	while (!nai_flags.sigexit) {
 		usb_process();
+		daemon_process();
 	}
 
 	return 0;
