@@ -68,6 +68,9 @@ flag_t config_init(char *configfilename) {
 	// We read everything, a default value will be set for non-existent keys in the config file.
 	tmp = config_get_runonalarm();
 	free(tmp);
+	config_get_eepromcounter_page();
+	config_get_eepromcounter_address();
+
 	config_writeconfigfile();
 	return 1;
 }
@@ -95,3 +98,51 @@ char* config_get_runonalarm(void) {
 	return res;
 }
 
+char* config_get_runoneepromcounterincrease(void) {
+	GError *error = NULL;
+	char *res = g_key_file_get_string(keyfile, "main", "runoneepromcounterincrease", &error);
+	if (error) {
+		fprintf(stderr, "config: no \"runoneepromcounterincrease\" setting found in config file, using default.\n");
+		res = (char*)malloc(16);
+		if (res) {
+			snprintf(res, 16, "naieepromerr.sh");
+			g_key_file_set_string(keyfile, "main", "runoneepromcounterincrease", res);
+		}
+	}
+	printf("config: read \"runoneepromcounterincrease\" setting: %s\n", res);
+	return res;
+}
+
+int config_get_eepromcounter_page(void) {
+	GError *error = NULL;
+	int val = g_key_file_get_integer(keyfile, "main", "eepromcounter-page", &error);
+	if (error) {
+		fprintf(stderr, "config: no \"eepromcounter-page\" setting found in config file, using default.\n");
+		g_key_file_set_integer(keyfile, "main", "eepromcounter-page", 0);
+		val = 1;
+	}
+	printf("config: read \"eepromcounter-page\" setting: %d\n", val);
+	return val;
+}
+
+void config_set_eepromcounter_page(int page) {
+	g_key_file_set_integer(keyfile, "main", "eepromcounter-page", page);
+	config_writeconfigfile();
+}
+
+int config_get_eepromcounter_address(void) {
+	GError *error = NULL;
+	int val = g_key_file_get_integer(keyfile, "main", "eepromcounter-address", &error);
+	if (error) {
+		fprintf(stderr, "config: no \"eepromcounter-address\" setting found in config file, using default.\n");
+		g_key_file_set_integer(keyfile, "main", "eepromcounter-address", 0);
+		val = 1;
+	}
+	printf("config: read \"eepromcounter-address\" setting: %d\n", val);
+	return val;
+}
+
+void config_set_eepromcounter_address(int address) {
+	g_key_file_set_integer(keyfile, "main", "eepromcounter-address", address);
+	config_writeconfigfile();
+}

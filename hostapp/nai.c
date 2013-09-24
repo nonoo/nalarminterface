@@ -50,9 +50,9 @@ void nai_checkboard(void) {
 	nai_checkboardsentat = time(NULL);
 }
 
-void nai_gotinterrupt(nai_statusbyte_t statusbyte) {
+static void nai_gotinterrupt(nai_statusbyte_t statusbyte) {
 	char *runonalarm = NULL;
-	char cmd[255];
+	char cmd[255] = {0};
 
 	printf("nai: got interrupt.\n");
 	runonalarm = config_get_runonalarm();
@@ -71,6 +71,23 @@ void nai_gotinterrupt(nai_statusbyte_t statusbyte) {
 	free(runonalarm);
 }
 
+static void nai_eepromcounterhasincreased(int newpage, int newaddress) {
+	char *runoneepromcounterincrease = NULL;
+	char cmd[255] = {0};
+
+	printf("nai: eeprom counter has increased.\n");
+	runoneepromcounterincrease = config_get_runoneepromcounterincrease();
+	snprintf(cmd, sizeof(cmd), "%s %d %d %d %d", runoneepromcounterincrease,
+		newpage,
+		newaddress,
+		config_get_eepromcounter_page(),
+		config_get_eepromcounter_address());
+	printf("nai: executing: %s\n", cmd);
+	if (system(cmd) < 0)
+		fprintf(stderr, "nai error: error on exec.\n");
+	free(runoneepromcounterincrease);
+}
+
 void nai_usb_packet_received_cb(nai_usbpacket_t *usbpacket) {
 	nai_statusbyte_t *statusbyte = NULL;
 
@@ -86,6 +103,12 @@ void nai_usb_packet_received_cb(nai_usbpacket_t *usbpacket) {
 		case NAI_USBPACKET_TYPE_GETEEPROMCOUNTER | NAI_USBPACKET_TYPE_RESPONSE:
 			printf("nai: received get eeprom counter response: page %d address %d.\n",
 				usbpacket->payload[0], usbpacket->payload[1]);
+			if (usbpacket->payload[0] != config_get_eepromcounter_page() ||
+				usbpacket->payload[1] != config_get_eepromcounter_address()) {
+					nai_eepromcounterhasincreased(usbpacket->payload[0], usbpacket->payload[1]);
+					config_set_eepromcounter_page(usbpacket->payload[0]);
+					config_set_eepromcounter_address(usbpacket->payload[1]);
+				}
 			break;
 		case NAI_USBPACKET_TYPE_GETSTATUSBYTE | NAI_USBPACKET_TYPE_RESPONSE:
 			printf("nai: received get status byte response.\n");
