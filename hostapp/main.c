@@ -1,4 +1,4 @@
-#include "daemon.h"
+#include "daemon-poll.h"
 #include "usb.h"
 #include "types.h"
 
@@ -12,8 +12,6 @@
 
 #define VERSION "0.1"
 
-static int daemonize = 1;
-
 nai_flags_t nai_flags = {0};
 
 static void printversion(void) {
@@ -25,19 +23,15 @@ static void printusage(void) {
 	printversion();
 	printf("usage: -h         - this help\n");
 	printf("       -v         - print version\n");
-	printf("       -f         - don't fork to the background\n");
 }
 
 static void processcommandline(int argc, char **argv) {
 	int r;
 
-	while ((r = getopt(argc, argv, "hvf")) != -1) {
+	while ((r = getopt(argc, argv, "hv")) != -1) {
 		switch (r) {
 			case 'v':
 				printversion();
-				break;
-			case 'f':
-				daemonize = 0;
 				break;
 			case 'h':
 				printusage();
@@ -64,19 +58,17 @@ int main(int argc, char **argv) {
 	if (!usb_init())
 		return 1;
 
-	daemon_init();
-
-	if (daemonize)
-		daemon_daemonize();
+	daemon_poll_init();
 
 	while (!nai_flags.sigexit) {
 		if (!usb_process())
 			break;
-		daemon_process();
+		if (!daemon_poll_process())
+			break;
 	}
 
 	usb_deinit();
-	daemon_deinit();
+	daemon_poll_deinit();
 
 	return 0;
 }
