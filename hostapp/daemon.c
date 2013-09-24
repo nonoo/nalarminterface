@@ -7,9 +7,11 @@ void daemon_daemonize(void) {
 	// TODO
 }
 
-void daemon_process(void) {
+flag_t daemon_process(void) {
 	// TODO
-	daemon_poll_process();
+	if (!daemon_poll_process())
+		return 0;
+	return 1;
 }
 
 void daemon_init(void) {

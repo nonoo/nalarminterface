@@ -10,8 +10,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 
-#define USBTIMEOUTINMS 1000
-
 #define EP_INT_IN			(1 | LIBUSB_ENDPOINT_IN)
 #define EP_INT_OUT			(2 | LIBUSB_ENDPOINT_OUT)
 #define EP_INT_LENGTH		64
@@ -178,6 +176,8 @@ static libusb_device_handle* usb_open(int vid, int pid) {
 static flag_t usb_initreceivecallback(void) {
 	static uint8_t usb_intinbuf[sizeof(nai_usbpacket_t)] = {0};
 
+	// libusb treats USB packet rx events as transfers which have to be started to be able
+	// to receive anything, and complete when the packet receive is finished.
 	usb_int_transfer = libusb_alloc_transfer(0);
 	if (!usb_int_transfer)
 		return 0;

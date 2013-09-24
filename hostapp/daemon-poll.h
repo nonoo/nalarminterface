@@ -20,7 +20,7 @@ void daemon_poll_setmaxtimeout(int timeout);
 flag_t daemon_poll_isfdreadable(int fd);
 flag_t daemon_poll_isfdwritable(int fd);
 
-void daemon_poll_process(void);
+flag_t daemon_poll_process(void);
 void daemon_poll_init(void);
 void daemon_poll_deinit(void);
 
