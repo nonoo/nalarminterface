@@ -21,25 +21,13 @@ typedef struct {
 	uint8_t eepromupdated : 1;
 } nai_flags_t;
 
-#define NAI_USBPACKET_TYPE_RESETINTERRUPTS	0
-#define NAI_USBPACKET_TYPE_GETSTATUSBYTE	1
-#define NAI_USBPACKET_TYPE_GETEEPROMCOUNTER	2
-#define NAI_USBPACKET_TYPE_CHECKBOARD		3
-#define NAI_USBPACKET_TYPE_RESPONSE			128
-
-typedef struct {
-	uint8_t type;
-	uint8_t payload[2];
-} nai_usbpacket_t;
-
-#define USBBUFSIZE sizeof(nai_usbpacket_t)
-typedef uint8_t usb_buf_t[USBBUFSIZE];
-
 typedef struct {
 	uint16_t usb_blinkrxtxledpulsecount;
 	uint8_t usb_connected : 1;
 	uint8_t usb_vendor_enabled : 1;
 	uint8_t usb_ledstate : 1;
 } naiboard_state_t;
+
+#include "../common/usbprotocol.h"
 
 #endif
