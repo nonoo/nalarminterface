@@ -72,5 +72,8 @@ int main(int argc, char **argv) {
 		daemon_process();
 	}
 
+	usb_deinit();
+	daemon_deinit();
+
 	return 0;
 }

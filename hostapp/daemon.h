@@ -3,5 +3,6 @@
 
 void daemon_daemonize(void);
 void daemon_process(void);
+void daemon_deinit(void);
 
 #endif

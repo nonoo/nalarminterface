@@ -8,4 +8,9 @@ void daemon_daemonize(void) {
 }
 
 void daemon_process(void) {
+	// TODO
+}
+
+void daemon_deinit(void) {
+	// TODO
 }

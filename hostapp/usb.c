@@ -35,7 +35,7 @@ static void LIBUSB_CALL usb_send_int_cb(struct libusb_transfer *transfer) {
 
 	if (transfer->status == LIBUSB_TRANSFER_CANCELLED) {
 		// This happens when we cancel the transfer in usb_deinit(), so this case is not an error.
-		fprintf(stderr, "usb error: transfer cancelled\n");
+		printf("usb: transfer cancelled\n");
 		return;
 	}
 
@@ -48,14 +48,14 @@ static void LIBUSB_CALL usb_send_int_cb(struct libusb_transfer *transfer) {
 	printf("usb: sending int transfer completed.\n");
 }
 
-int usb_send_int(uint8_t *data, int length) {
+void usb_send_int(uint8_t *data, int length) {
 	struct libusb_transfer *transfer;
 	uint8_t *intbuf;
 	int i;
 
 	if (!usb_state.connected) {
-		fprintf(stderr, "usb error: can't send int packet, interface not connected.\n");
-		return -1;
+		printf("usb: can't send int packet, interface not connected.\n");
+		return;
 	}
 
 	printf("usb: sending int (length: %d): ", length);
@@ -66,7 +66,8 @@ int usb_send_int(uint8_t *data, int length) {
 	intbuf = (uint8_t *)malloc(sizeof(nai_usbpacket_t));
 	if (!intbuf) {
 		fprintf(stderr, "usb error: can't send int packet, out of memory.\n");
-		return -2;
+		usb_state.error = 1;
+		return;
 	}
 	memcpy(intbuf, data, length);
 
@@ -74,8 +75,9 @@ int usb_send_int(uint8_t *data, int length) {
 
 	if (!transfer) {
 		fprintf(stderr, "usb error: can't allocate transfer for int sending.\n");
+		usb_state.error = 1;
 		free(intbuf);
-		return -2;
+		return;
 	}
 
 	libusb_fill_interrupt_transfer(transfer, usb_devh, EP_INT_OUT, intbuf, sizeof(nai_usbpacket_t), usb_send_int_cb, NULL, 0);
@@ -83,12 +85,9 @@ int usb_send_int(uint8_t *data, int length) {
 
 	if (libusb_submit_transfer(transfer) < 0) {
 		fprintf(stderr, "usb error: int transfer error.\n");
-		libusb_free_transfer(transfer);
-		return -2;
-	}
-
-	printf("usb: int transfer submitted.\n");
-	return 0;
+		usb_state.error = 1;
+	} else
+		printf("usb: int transfer submitted.\n");
 }
 
 static void LIBUSB_CALL usb_receive_int_cb(struct libusb_transfer *transfer) {
@@ -120,7 +119,12 @@ static void LIBUSB_CALL usb_receive_int_cb(struct libusb_transfer *transfer) {
 	}
 
 	// Reinitializing callback
-	libusb_submit_transfer(usb_int_transfer);
+	if (libusb_submit_transfer(usb_int_transfer) < 0) {
+		fprintf(stderr, "usb: can't initialize rx int transfer.\n");
+		usb_state.error = 1;
+		libusb_free_transfer(usb_int_transfer);
+		usb_int_transfer = NULL;
+	}
 }
 
 static libusb_device_handle* usb_open(int vid, int pid) {
@@ -176,10 +180,6 @@ static void usb_pollfd_added_cb(int fd, short events, void *user_data) {
 }
 static void usb_pollfd_removed_cb(int fd, void *user_data) {
 	daemon_poll_removefd(fd);
-}
-
-static void usb_deinit() {
-	// TODO
 }
 
 flag_t usb_init() {
@@ -267,6 +267,47 @@ flag_t usb_init() {
 		return 0;
 	}
 	return 1;
+}
+
+void usb_deinit() {
+	struct timeval tv;
+
+	printf("usb: deinit.\n");
+
+	usb_state.initfinished = 0;
+
+	if (usb_int_transfer && usb_int_transfer->status != LIBUSB_TRANSFER_CANCELLED) {
+		printf("usb: int transfer pending, cancelling.\n");
+		if (libusb_cancel_transfer(usb_int_transfer) == 0) {
+			tv.tv_sec = 1;
+			tv.tv_usec = 0;
+			libusb_handle_events_timeout(usb_ctx, &tv);
+		}
+	}
+
+	if (usb_int_transfer) {
+		printf("usb: freeing int transfer.\n");
+		libusb_free_transfer(usb_int_transfer);
+		usb_int_transfer = NULL;
+	}
+
+	if (usb_state.claimed) {
+		printf("usb: releasing interface.\n");
+		libusb_release_interface(usb_devh, 0);
+		usb_state.claimed = 0;
+	}
+	if (usb_devh > 0) {
+		printf("usb: closing device.\n");
+		libusb_close(usb_devh);
+		usb_devh = NULL;
+	}
+	if (usb_ctx) {
+		printf("usb: freeing usb context.\n");
+		libusb_exit(usb_ctx);
+		usb_ctx = NULL;
+	}
+	memset(&usb_state, 0, sizeof(usb_state));
+	printf("usb: deinit finished.\n");
 }
 
 void usb_process(void) {
