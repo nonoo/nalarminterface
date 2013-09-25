@@ -94,6 +94,10 @@ int main(int argc, char **argv) {
 	// Setting default file permissions to o+rw
 	umask(~(S_IRUSR | S_IWUSR));
 
+	// Turning off buffering
+	setvbuf(stdout, NULL, _IONBF, 0);
+	setvbuf(stderr, NULL, _IONBF, 0);
+
 	processcommandline(argc, argv);
 
 	if (!config_init(configfilename))
