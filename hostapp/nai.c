@@ -10,11 +10,14 @@
 #define CHECKBOARDSENDPERIODINSEC		15
 #define CHECKEEPROMCOUNTERPERIODINSEC	30
 
-static time_t nai_checkboardsentat = 0;
-static time_t nai_gotcheckboardat = 0;
-static time_t nai_geteepromcountersentat = 0;
-static flag_t nai_connected = 0;
+static struct {
+	time_t checkboardsentat;
+	time_t gotcheckboardat;
+	time_t geteepromcountersentat;
+	flag_t connected;
+} nai_state = {0};
 
+// Starts a get status byte transfer.
 void nai_getstatusbyte(void) {
 	nai_usbpacket_t usbpacket = {0};
 
@@ -24,6 +27,7 @@ void nai_getstatusbyte(void) {
 	usb_send_naipacket(&usbpacket);
 }
 
+// Starts a get EEPROM counter transfer.
 void nai_geteepromcounter(void) {
 	nai_usbpacket_t usbpacket = {0};
 
@@ -31,9 +35,10 @@ void nai_geteepromcounter(void) {
 
 	usbpacket.type = NAI_USBPACKET_TYPE_GETEEPROMCOUNTER;
 	usb_send_naipacket(&usbpacket);
-	nai_geteepromcountersentat = time(NULL);
+	nai_state.geteepromcountersentat = time(NULL);
 }
 
+// Starts a reset interrupts transfer.
 void nai_resetinterrupts(void) {
 	nai_usbpacket_t usbpacket = {0};
 
@@ -43,6 +48,7 @@ void nai_resetinterrupts(void) {
 	usb_send_naipacket(&usbpacket);
 }
 
+// Starts a checkboard transfer.
 void nai_checkboard(void) {
 	nai_usbpacket_t usbpacket = {0};
 
@@ -50,9 +56,11 @@ void nai_checkboard(void) {
 
 	usbpacket.type = NAI_USBPACKET_TYPE_CHECKBOARD;
 	usb_send_naipacket(&usbpacket);
-	nai_checkboardsentat = time(NULL);
+	nai_state.checkboardsentat = time(NULL);
 }
 
+// This gets called when an alarm interrupt is received (one of the interrupt flags
+// were 1 in the received status byte).
 static void nai_gotinterrupt(nai_statusbyte_t statusbyte) {
 	char *runonalarm = NULL;
 	char cmd[255] = {0};
@@ -72,8 +80,12 @@ static void nai_gotinterrupt(nai_statusbyte_t statusbyte) {
 	if (system(cmd) < 0)
 		fprintf(stderr, "nai error: error on exec.\n");
 	free(runonalarm);
+
+	nai_resetinterrupts();
 }
 
+// This gets called when the EEPROM counter is increased (the received counter value
+// was greater than the stored one).
 static void nai_eepromcounterhasincreased(int newpage, int newaddress) {
 	char *runoneepromcounterincrease = NULL;
 	char cmd[255] = {0};
@@ -89,16 +101,21 @@ static void nai_eepromcounterhasincreased(int newpage, int newaddress) {
 	if (system(cmd) < 0)
 		fprintf(stderr, "nai error: error on exec.\n");
 	free(runoneepromcounterincrease);
+
+	// Storing the new EEPROM counter values.
+	config_set_eepromcounter_page(newpage);
+	config_set_eepromcounter_address(newaddress);
 }
 
+// This gets called when a nai packet is received.
 void nai_usb_packet_received_cb(nai_usbpacket_t *usbpacket) {
 	nai_statusbyte_t *statusbyte = NULL;
 
 	switch (usbpacket->type) {
 		case NAI_USBPACKET_TYPE_CHECKBOARD | NAI_USBPACKET_TYPE_RESPONSE:
 			printf("nai: received checkboard response.\n");
-			nai_checkboardsentat = 0;
-			nai_gotcheckboardat = time(NULL);
+			nai_state.checkboardsentat = 0;
+			nai_state.gotcheckboardat = time(NULL);
 			break;
 		case NAI_USBPACKET_TYPE_RESETINTERRUPTS | NAI_USBPACKET_TYPE_RESPONSE:
 			printf("nai: received reset interrupts response.\n");
@@ -106,12 +123,11 @@ void nai_usb_packet_received_cb(nai_usbpacket_t *usbpacket) {
 		case NAI_USBPACKET_TYPE_GETEEPROMCOUNTER | NAI_USBPACKET_TYPE_RESPONSE:
 			printf("nai: received get eeprom counter response: page %d address %d.\n",
 				usbpacket->payload[0], usbpacket->payload[1]);
+
 			if (usbpacket->payload[0] != config_get_eepromcounter_page() ||
-				usbpacket->payload[1] != config_get_eepromcounter_address()) {
+				usbpacket->payload[1] != config_get_eepromcounter_address())
 					nai_eepromcounterhasincreased(usbpacket->payload[0], usbpacket->payload[1]);
-					config_set_eepromcounter_page(usbpacket->payload[0]);
-					config_set_eepromcounter_address(usbpacket->payload[1]);
-				} else
+				else
 					printf("nai: eeprom counter check ok.\n");
 			break;
 		case NAI_USBPACKET_TYPE_GETSTATUSBYTE | NAI_USBPACKET_TYPE_RESPONSE:
@@ -119,31 +135,38 @@ void nai_usb_packet_received_cb(nai_usbpacket_t *usbpacket) {
 			statusbyte = (nai_statusbyte_t *)&usbpacket->payload[0];
 			if (statusbyte->p1int || statusbyte->p2int || statusbyte->p3int || statusbyte->p4int)
 				nai_gotinterrupt(*statusbyte);
+			else
+				printf("nai: status byte ok, no interrupt happened.\n");
 			break;
 	}
 }
 
+// This gets called when the USB interface is successfully connected.
 void nai_usb_connected_cb(void) {
 	printf("nai: usb interface connected.\n");
-	nai_connected = 1;
+	nai_state.connected = 1;
 	nai_geteepromcounter();
 	nai_getstatusbyte();
 }
 
 flag_t nai_process(void) {
-	if (nai_connected) {
-		if (nai_checkboardsentat) { // Checkboard already sent but no response received yet
-			if (time(NULL) - nai_checkboardsentat > CHECKBOARDTIMEOUTINSEC) {
+	if (nai_state.connected) {
+		if (nai_state.checkboardsentat) { // Checkboard already sent but no response received yet
+			if (time(NULL) - nai_state.checkboardsentat > CHECKBOARDTIMEOUTINSEC) {
+				// This happens when we can't reach the USB interface (it won't respond to
+				// checkboard requests).
 				fprintf(stderr, "nai error: checkboard timeout.\n");
 				return 0;
 			}
 		} else { // Checkboard not sent yet
-			if (time(NULL) - nai_gotcheckboardat > CHECKBOARDSENDPERIODINSEC) {
+			if (time(NULL) - nai_state.gotcheckboardat > CHECKBOARDSENDPERIODINSEC) {
+				// Checking board periodically.
 				printf("nai: periodic board check timeout.\n");
 				nai_checkboard();
 			}
 		}
-		if (time(NULL) - nai_geteepromcountersentat > CHECKEEPROMCOUNTERPERIODINSEC) {
+		if (time(NULL) - nai_state.geteepromcountersentat > CHECKEEPROMCOUNTERPERIODINSEC) {
+			// Checking the EEPROM counter periodically.
 			printf("nai: check eeprom counter timeout.\n");
 			nai_geteepromcounter();
 		}

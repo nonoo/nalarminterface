@@ -15,17 +15,18 @@
 #define EP_INT_LENGTH		64
 
 static struct {
-	int claimed : 1;
-	int initfinished : 1;
-	int checkboardsent : 1;
-	int connected : 1;
-	int error : 1;
+	int claimed			: 1;
+	int initfinished	: 1;
+	int checkboardsent	: 1;
+	int connected		: 1;
+	int error			: 1;
 } usb_state = {0};
 
 static libusb_context *usb_ctx = NULL;
 static struct libusb_device_handle *usb_devh = NULL;
 static struct libusb_transfer *usb_int_transfer = NULL;
 
+// This gets called when the int transfer finished.
 static void LIBUSB_CALL usb_send_int_cb(struct libusb_transfer *transfer) {
 	if (!transfer)
 		return;
@@ -45,16 +46,26 @@ static void LIBUSB_CALL usb_send_int_cb(struct libusb_transfer *transfer) {
 	printf("usb: sending int transfer completed.\n");
 }
 
+// This function sends the given data as a USB int packet.
 static void usb_send_int(uint8_t *data, int length) {
 	struct libusb_transfer *transfer = NULL;
 	uint8_t *intbuf = NULL;
 	int i = 0;
+
+	// USB communication is done using fixed-size packets.
+	if (length > sizeof(nai_usbpacket_t)) {
+		fprintf(stderr, "usb error: can't send int packet, length (%d) " \
+			"is larger than max usb packet size (%ld).\n", length, sizeof(nai_usbpacket_t));
+		usb_state.error = 1;
+		return;
+	}
 
 	printf("usb: sending int (length: %d): ", length);
 	for (i = 0; i < length; i++)
 		printf("%.2x", data[i]);
 	printf("\n");
 
+	// Copying the data to a fixed-size buffer.
 	intbuf = (uint8_t *)malloc(sizeof(nai_usbpacket_t));
 	if (!intbuf) {
 		fprintf(stderr, "usb error: can't send int packet, out of memory.\n");
@@ -64,7 +75,6 @@ static void usb_send_int(uint8_t *data, int length) {
 	memcpy(intbuf, data, length);
 
 	transfer = libusb_alloc_transfer(0);
-
 	if (!transfer) {
 		fprintf(stderr, "usb error: can't allocate transfer for int sending.\n");
 		usb_state.error = 1;
@@ -73,7 +83,9 @@ static void usb_send_int(uint8_t *data, int length) {
 	}
 
 	libusb_fill_interrupt_transfer(transfer, usb_devh, EP_INT_OUT, intbuf, sizeof(nai_usbpacket_t), usb_send_int_cb, NULL, 0);
-	transfer->flags |= LIBUSB_TRANSFER_FREE_BUFFER | LIBUSB_TRANSFER_FREE_TRANSFER; // Free the buffer when the transfer is freed and free the transfer after the callback returns
+	// Setting flags: free the buffer when the transfer is freed and
+	// free the transfer after the callback returns.
+	transfer->flags |= LIBUSB_TRANSFER_FREE_BUFFER | LIBUSB_TRANSFER_FREE_TRANSFER;
 
 	if (libusb_submit_transfer(transfer) < 0) {
 		fprintf(stderr, "usb error: int transfer error.\n");
@@ -82,6 +94,7 @@ static void usb_send_int(uint8_t *data, int length) {
 		printf("usb: int transfer submitted.\n");
 }
 
+// This is a wrapper for usb_send_int() with connection checking.
 void usb_send_naipacket(nai_usbpacket_t *usbpacket) {
 	if (!usb_state.connected) {
 		printf("usb: can't send nai packet, interface not connected.\n");
@@ -90,6 +103,7 @@ void usb_send_naipacket(nai_usbpacket_t *usbpacket) {
 	usb_send_int((uint8_t *)usbpacket, sizeof(nai_usbpacket_t));
 }
 
+// This gets called when a nai packet is received.
 static void usb_packet_received_cb(nai_usbpacket_t *usbpacket) {
 	switch (usbpacket->type) {
 		case NAI_USBPACKET_TYPE_CHECKBOARD | NAI_USBPACKET_TYPE_RESPONSE:
@@ -97,12 +111,14 @@ static void usb_packet_received_cb(nai_usbpacket_t *usbpacket) {
 			if (!usb_state.connected) {
 				printf("usb: interface is now connected.\n");
 				usb_state.connected = 1;
+
 				nai_usb_connected_cb();
 			}
 			break;
 	}
 }
 
+// This gets called when an int packet is received.
 static void LIBUSB_CALL usb_receive_int_cb(struct libusb_transfer *transfer) {
 	printf("usb: int received, transfer status: ");
 	switch (transfer->status) {
@@ -126,14 +142,14 @@ static void LIBUSB_CALL usb_receive_int_cb(struct libusb_transfer *transfer) {
 		return;
 	}
 
-	if (transfer->actual_length == sizeof(nai_usbpacket_t)) {
-		// Handling connection-specific commands
+	if (transfer->actual_length == sizeof(nai_usbpacket_t)) { // Is this a nai packet?
+		// Handling connection-specific commands.
 		usb_packet_received_cb((nai_usbpacket_t *)transfer->buffer);
-		// Passing other commands to the upper layer
+		// Passing other commands to the upper layer (nai module).
 		nai_usb_packet_received_cb((nai_usbpacket_t *)transfer->buffer);
 	}
 
-	// Reinitializing callback
+	// Reinitializing callback.
 	if (libusb_submit_transfer(usb_int_transfer) < 0) {
 		fprintf(stderr, "usb: can't initialize rx int transfer.\n");
 		usb_state.error = 1;
@@ -142,6 +158,7 @@ static void LIBUSB_CALL usb_receive_int_cb(struct libusb_transfer *transfer) {
 	}
 }
 
+// This function opens and returns the handle of the device with the given vid/pid.
 static libusb_device_handle* usb_open(int vid, int pid) {
 	libusb_device **usbdevlist = NULL;
 	int i = 0, r = 0;
@@ -177,7 +194,7 @@ static flag_t usb_initreceivecallback(void) {
 	static uint8_t usb_intinbuf[sizeof(nai_usbpacket_t)] = {0};
 
 	// libusb treats USB packet rx events as transfers which have to be started to be able
-	// to receive anything, and complete when the packet receive is finished.
+	// to receive anything, and complete when the packet receiving is finished.
 	usb_int_transfer = libusb_alloc_transfer(0);
 	if (!usb_int_transfer)
 		return 0;

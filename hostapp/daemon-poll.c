@@ -8,6 +8,7 @@ static struct pollfd *pfd = NULL; // This stores the watched file descriptors as
 static int pfdcount = 0; // How much pollfd structures we store.
 static int polltimeout = 0;
 
+// Reallocates the file descriptor storage array.
 static flag_t daemon_poll_pfdrealloc(int count) {
 	struct pollfd *newpfd = (struct pollfd *)realloc(pfd, sizeof(struct pollfd) * count);
 
@@ -18,8 +19,9 @@ static flag_t daemon_poll_pfdrealloc(int count) {
 	return 1;
 }
 
+// Returns the array index of the given file descriptor.
 static int daemon_poll_getpfdindex(int fd) {
-	int i;
+	int i = 0;
 
 	for (i = 0; i < pfdcount; i++) {
 		if (pfd[i].fd == fd)
@@ -28,6 +30,8 @@ static int daemon_poll_getpfdindex(int fd) {
 	return -1;
 }
 
+// This function adds the given file descriptor to the watched file descriptor list.
+// Events represents the events we need to watch on this fd (see "man poll").
 void daemon_poll_addfd(int fd, short events) {
 	int i = daemon_poll_getpfdindex(fd);
 
@@ -38,8 +42,10 @@ void daemon_poll_addfd(int fd, short events) {
 		return;
 	}
 
-	if (!daemon_poll_pfdrealloc(pfdcount+1))
+	if (!daemon_poll_pfdrealloc(pfdcount+1)) {
+		fprintf(stderr, "daemon-poll: can't realloc pfd storage.\n");
 		return;
+	}
 
 	pfd[pfdcount].fd = fd;
 	pfd[pfdcount].events = events;
@@ -48,20 +54,24 @@ void daemon_poll_addfd(int fd, short events) {
 	printf("daemon-poll: added fd %d (events: %d) to watched set.\n", events, fd);
 }
 
+// Wrapper for daemon_poll_addfd().
 void daemon_poll_addfd_read(int fd) {
 	daemon_poll_addfd(fd, POLLIN);
 }
 
+// Wrapper for daemon_poll_addfd().
 void daemon_poll_addfd_write(int fd) {
 	daemon_poll_addfd(fd, POLLOUT);
 }
 
+// Wrapper for daemon_poll_addfd().
 void daemon_poll_addfd_readwrite(int fd) {
 	daemon_poll_addfd(fd, POLLIN | POLLOUT);
 }
 
+// This function removes the given file descriptor from the watched file descriptor list.
 void daemon_poll_removefd(int fd) {
-	int i, found = 0;
+	int i = 0, found = 0;
 
 	if (pfdcount <= 0)
 		return;
@@ -82,11 +92,13 @@ void daemon_poll_removefd(int fd) {
 		pfdcount--;
 		daemon_poll_pfdrealloc(pfdcount);
 		printf("daemon-poll: removed fd %d from watched set.\n", fd);
-	} else {
+	} else
 		fprintf(stderr, "daemon-poll: can't remove fd %d from watched set.\n", fd);
-	}
 }
 
+// This function sets the maximum timeout the poll() call will wait if no events happen on
+// the watched file descriptors. The timeout will be reseted to a default value after the
+// poll() call.
 void daemon_poll_setmaxtimeout(int timeout) {
 	if (timeout < polltimeout) {
 		printf("daemon-poll: setting max. poll timeout to %d ms.\n", timeout);
@@ -94,6 +106,7 @@ void daemon_poll_setmaxtimeout(int timeout) {
 	}
 }
 
+// Queries the result of the poll() call for the given file descriptor.
 flag_t daemon_poll_isfdreadable(int fd) {
 	int i = daemon_poll_getpfdindex(fd);
 
@@ -103,6 +116,7 @@ flag_t daemon_poll_isfdreadable(int fd) {
 	return ((pfd[i].revents & POLLIN) > 0);
 }
 
+// Queries the result of the poll() call for the given file descriptor.
 flag_t daemon_poll_isfdwritable(int fd) {
 	int i = daemon_poll_getpfdindex(fd);
 
@@ -113,25 +127,30 @@ flag_t daemon_poll_isfdwritable(int fd) {
 }
 
 flag_t daemon_poll_process(void) {
-//	printf("daemon-poll: calling poll() on %d fds, timeout: %d ms.\n", pfdcount, polltimeout);
+	printf("daemon-poll: calling poll() on %d fds, timeout: %d ms.\n", pfdcount, polltimeout);
 	if (poll(pfd, pfdcount, polltimeout) < 0) {
 		fprintf(stderr, "daemon-poll: poll() error.\n");
 		return 0;
 	}
-//	printf("daemon-poll: poll() exited, continuing execution.\n");
+	printf("daemon-poll: poll() exited, continuing execution.\n");
 
 	// Setting a default poll timeout, this can be overridden once at a time by daemon_set_max_polltimeout()
-	polltimeout = 100;
+	polltimeout = 1000;
 	return 1;
 }
 
 void daemon_poll_init(void) {
+	if (pfd) {
+		free(pfd);
+		pfd = NULL;
+	}
 	pfdcount = 0;
 }
 
 void daemon_poll_deinit(void) {
-	if (pfd)
+	if (pfd) {
 		free(pfd);
-	pfd = NULL;
+		pfd = NULL;
+	}
 	pfdcount = 0;
 }
