@@ -68,6 +68,8 @@ flag_t config_init(char *configfilename) {
 	// We read everything, a default value will be set for non-existent keys in the config file.
 	tmp = config_get_runonalarm();
 	free(tmp);
+	tmp = config_get_runoneepromcounterincrease();
+	free(tmp);
 	config_get_eepromcounter_page();
 	config_get_eepromcounter_address();
 

@@ -10,6 +10,8 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #define VERSION "0.1"
 
@@ -89,6 +91,9 @@ int main(int argc, char **argv) {
 	signal(SIGTERM, sighandler);
 	signal(SIGPIPE, SIG_IGN);
 
+	// Setting default file permissions to o+rw
+	umask(~(S_IRUSR | S_IWUSR));
+
 	processcommandline(argc, argv);
 
 	if (!config_init(configfilename))
@@ -97,7 +102,7 @@ int main(int argc, char **argv) {
 	daemon_poll_init();
 
 	if (!usb_init())
-		return 1;
+		return 2;
 
 	while (!nai_flags.sigexit) {
 		if (!usb_process())
