@@ -94,10 +94,10 @@ int main(int argc, char **argv) {
 	if (!config_init(configfilename))
 		return 1;
 
+	daemon_poll_init();
+
 	if (!usb_init())
 		return 1;
-
-	daemon_poll_init();
 
 	while (!nai_flags.sigexit) {
 		if (!usb_process())
