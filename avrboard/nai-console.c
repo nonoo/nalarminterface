@@ -6,6 +6,7 @@
 #include "naiboard-eeprom.h"
 #include "naiboard-ports.h"
 #include "types.h"
+#include "nai.h"
 
 #include <avr/avr_compiler.h>
 
@@ -54,6 +55,8 @@ void nai_console_processcommand(char *buffer) {
 		printf_P(PSTR("  stp     - status byte print\n"));
 		printf_P(PSTR("  ecp     - eeprom counter print\n"));
 		printf_P(PSTR("  ctp     - current time print\n"));
+		printf_P(PSTR("  ser     - send eepromcounter response to the host\n"));
+		printf_P(PSTR("  sgr     - send getstatusbyte response to the host\n"));
 		return;
 	}
 	if (strcmp(tok, "rst") == 0) {
@@ -75,6 +78,14 @@ void nai_console_processcommand(char *buffer) {
 	}
 	if (strcmp(tok, "ctp") == 0) {
 		nai_console_printcurrenttime();
+		return;
+	}
+	if (strcmp(tok, "ser") == 0) {
+		nai_send_eepromcounterresponse();
+		return;
+	}
+	if (strcmp(tok, "sgr") == 0) {
+		nai_send_getstatusbyteresponse();
 		return;
 	}
 	printf(PSTR("unknown command, use help.\n"));

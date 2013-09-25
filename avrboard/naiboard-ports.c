@@ -34,7 +34,7 @@ void naiboard_ports_init(void) {
 // These are the interrupt handlers for the watched pins
 ISR(P1INTVECT) {
 	nai_statusbyte.p1int = 1;
-	nai_flags.eepromupdated = 0;
+	nai_flags.eepromupdated = 0; // This will trigger EEPROM value update.
 }
 ISR(P2INTVECT) {
 	nai_statusbyte.p2int = 1;

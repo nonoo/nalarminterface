@@ -13,7 +13,8 @@
 #define EE_COUNTER_PAGEVAL		0
 #define EE_COUNTER_ADDRVAL		1
 
-// These will be the default init values
+// These will be the default init values if the page/address is pointing
+// to the addresses where the EEPROM counter is stored.
 #define EE_COUNTER_INIT_PAGE	0
 #define EE_COUNTER_INIT_ADDR	2
 
@@ -49,14 +50,19 @@ uint8_t naiboard_eeprom_readstatusbyte(void) {
 }
 
 void naiboard_eeprom_writestatusbyte(uint8_t statusbyte) {
-	if (naiboard_eeprom_readstatusbyte() == statusbyte) // Not updating if not necessary
+	if (naiboard_eeprom_readstatusbyte() == statusbyte) { // Not updating if not necessary
+		printf_P(PSTR("naiboard-eeprom: status byte up-to-date, no update necessary.\n"));
 		return;
+	}
 
+	printf_P(PSTR("naiboard-eeprom: updating status byte.\n"));
 	EEPROM_WriteByte(naiboard_eepromcounter_page, naiboard_eepromcounter_addr, ~statusbyte);
 
 	if (naiboard_eeprom_readstatusbyte() != statusbyte) { // If the read back value is not correct
+		printf_P(PSTR("naiboard-eeprom: status byte read back error.\n"));
 		naiboard_eeprom_increasecounter();
 		// Trying writing again to a different EEPROM byte
+		printf_P(PSTR("naiboard-eeprom: updating status byte again.\n"));
 		EEPROM_WriteByte(naiboard_eepromcounter_page, naiboard_eepromcounter_addr, ~statusbyte);
 	}
 }

@@ -41,6 +41,7 @@ ISR(RTC_OVF_vect) {
 
 	naiboard_time++;
 
+	// Handling LED blinking on USB transfers.
 	if (naiboard_state.usb_blinkrxtxledpulsecount) {
 		if (naiboard_state.usb_ledstate)
 			naiboard_led1_off();

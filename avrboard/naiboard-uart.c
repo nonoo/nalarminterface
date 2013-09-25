@@ -28,7 +28,7 @@ static int naiboard_uart_putchar(char c, FILE *stream) {
 }
 
 void naiboard_process_stdin(void) {
-	uint8_t stdin_in;
+	uint8_t stdin_in = 0;
 	static char stdin_buffer[STDINBUFFERSIZE];
 	static uint8_t stdin_bufferpos;
 

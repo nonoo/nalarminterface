@@ -23,44 +23,74 @@ extern volatile naiboard_state_t naiboard_state;
 volatile nai_statusbyte_t nai_statusbyte;
 volatile nai_flags_t nai_flags;
 
+// This function copies the given nai packet to the fixed-size USB send buffer
+// and starts the transfer.
 static void nai_usbpacket_send(nai_usbpacket_t *cmd) {
 	memcpy(naiboard_usb_sendbuf, cmd, sizeof(nai_usbpacket_t));
 	naiboard_usb_int_send(naiboard_usb_sendbuf, sizeof(nai_usbpacket_t));
 }
 
+// Sends the EEPROM counter response packet to the host.
+void nai_send_eepromcounterresponse(void) {
+	nai_usbpacket_t response = {0};
+
+	printf_P(PSTR("nai: sending eeprom counter response to the host.\n"));
+
+	response.type = NAI_USBPACKET_TYPE_GETEEPROMCOUNTER | NAI_USBPACKET_TYPE_RESPONSE;
+	response.payload[0] = naiboard_eepromcounter_page;
+	response.payload[1] = naiboard_eepromcounter_addr;
+
+	nai_usbpacket_send(&response);
+}
+
+// Sends the getstatusbyte response to the host.
+void nai_send_getstatusbyteresponse(void) {
+	nai_usbpacket_t response = {0};
+
+	printf_P(PSTR("nai: sending status byte to the host.\n"));
+
+	naiboard_ports_readstatus();
+	nai_flags.eepromupdated = 0; // This will trigger writing the status byte to the EEPROM
+
+	response.type = NAI_USBPACKET_TYPE_GETSTATUSBYTE | NAI_USBPACKET_TYPE_RESPONSE;
+	response.payload[0] = *(uint8_t*)&nai_statusbyte;
+
+	nai_usbpacket_send(&response);
+}
+
 // This gets called when a USB packet is received
 void nai_usbpacket_received(nai_usbpacket_t *cmd) {
-	nai_usbpacket_t response;
+	nai_usbpacket_t response = {0};
 
-	printf_P(PSTR("nai_usbpacket_received(): "));
+	printf_P(PSTR("nai: received usb packet: "));
 
 	memset(&response, 0, sizeof(nai_usbpacket_t));
 	response.type = cmd->type | NAI_USBPACKET_TYPE_RESPONSE;
 	switch (cmd->type) {
 		case NAI_USBPACKET_TYPE_RESETINTERRUPTS:
-			printf("nai: host requested interrupt reset.\n");
+			printf_P(PSTR("resetinterrupts\n"));
 			nai_statusbyte.p1int = nai_statusbyte.p2int =
 				nai_statusbyte.p3int = nai_statusbyte.p4int = 0;
-			naiboard_ports_readstatus();
-			nai_flags.eepromupdated = 0; // This will trigger writing the status byte to the EEPROM
-			response.payload[0] = *(uint8_t*)&nai_statusbyte;
-			nai_usbpacket_send(&response);
+
+			nai_send_getstatusbyteresponse();
 			break;
 		case NAI_USBPACKET_TYPE_GETSTATUSBYTE:
-			naiboard_ports_readstatus();
-			nai_flags.eepromupdated = 0;
-			response.payload[0] = *(uint8_t*)&nai_statusbyte;
-			nai_usbpacket_send(&response);
+			printf_P(PSTR("getstatusbyte\n"));
+			nai_send_getstatusbyteresponse();
 			break;
 		case NAI_USBPACKET_TYPE_GETEEPROMCOUNTER:
-			response.payload[0] = naiboard_eepromcounter_page;
-			response.payload[1] = naiboard_eepromcounter_addr;
-			nai_usbpacket_send(&response);
+			printf_P(PSTR("geteepromcounter\n"));
+			nai_send_eepromcounterresponse();
 			break;
 		case NAI_USBPACKET_TYPE_CHECKBOARD:
+			printf_P(PSTR("checkboard\n"));
+			printf_P(PSTR("nai: sending checkboard response.\n"));
 			nai_usbpacket_send(&response);
-			// After this command we consider the host to be connected.
-			naiboard_state.usb_connected = 1;
+			if (!naiboard_state.usb_connected) {
+				// After this command we consider the host to be connected.
+				printf_P(PSTR("nai: host is now connected.\n"));
+				naiboard_state.usb_connected = 1;
+			}
 			break;
 	}
 }
@@ -74,8 +104,7 @@ static timestamp_t nai_calctimediff(timestamp_t t1, timestamp_t t2) {
 
 void nai_process(void) {
 	static timestamp_t laststatussendat;
-	timestamp_t diff;
-	nai_usbpacket_t usbpacket;
+	timestamp_t diff = 0;
 
 	if (!nai_flags.eepromupdated) {
 		printf_P(PSTR("nai: status byte needs updating in the eeprom.\n"));
@@ -87,13 +116,9 @@ void nai_process(void) {
 	if (nai_statusbyte.p1int || nai_statusbyte.p2int || nai_statusbyte.p3int || nai_statusbyte.p4int) {
 		diff = nai_calctimediff(naiboard_time, laststatussendat);
 		if (diff > STATUSBYTESENDINTERVALINTICKS) {
+			printf_P(PSTR("nai: interrupt active.\n"));
 			// Sending the status byte to the host periodically
-			printf_P(PSTR("nai: sending status byte to the host...\n"));
-			memset(&usbpacket, 0, sizeof(nai_usbpacket_t));
-			usbpacket.type = NAI_USBPACKET_TYPE_GETSTATUSBYTE | NAI_USBPACKET_TYPE_RESPONSE;
-			usbpacket.payload[0] = *(uint8_t*)&nai_statusbyte;
-			nai_usbpacket_send(&usbpacket);
-
+			nai_send_getstatusbyteresponse();
 			laststatussendat = naiboard_time;
 		}
 	}
