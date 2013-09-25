@@ -133,6 +133,23 @@ void nai_usb_packet_received_cb(nai_usbpacket_t *usbpacket) {
 		case NAI_USBPACKET_TYPE_GETSTATUSBYTE | NAI_USBPACKET_TYPE_RESPONSE:
 			printf("nai: received get status byte response.\n");
 			statusbyte = (nai_statusbyte_t *)&usbpacket->payload[0];
+			printf("nai: statusbyte: P1state - %d\n" \
+				   "                 P1int   - %d\n" \
+				   "                 P2state - %d\n" \
+				   "                 P2int   - %d\n" \
+				   "                 P3state - %d\n" \
+				   "                 P3int   - %d\n" \
+				   "                 P4state - %d\n" \
+				   "                 P4int   - %d\n",
+				   		statusbyte->p1state,
+				   		statusbyte->p1int,
+				   		statusbyte->p2state,
+				   		statusbyte->p2int,
+				   		statusbyte->p3state,
+				   		statusbyte->p3int,
+				   		statusbyte->p4state,
+				   		statusbyte->p4int);
+
 			if (statusbyte->p1int || statusbyte->p2int || statusbyte->p3int || statusbyte->p4int)
 				nai_gotinterrupt(*statusbyte);
 			else

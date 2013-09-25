@@ -113,10 +113,11 @@ void nai_process(void) {
 	}
 
 	// There was an interrupt?
-	if (nai_statusbyte.p1int || nai_statusbyte.p2int || nai_statusbyte.p3int || nai_statusbyte.p4int) {
+	if (ISNAIINTERRUPTACTIVE()) {
 		diff = nai_calctimediff(naiboard_time, laststatussendat);
 		if (diff > STATUSBYTESENDINTERVALINTICKS) {
 			printf_P(PSTR("nai: interrupt active.\n"));
+			nai_console_printstatusbyte();
 			// Sending the status byte to the host periodically
 			nai_send_getstatusbyteresponse();
 			laststatussendat = naiboard_time;

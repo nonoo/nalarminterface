@@ -3,6 +3,8 @@
 
 #include "types.h"
 
+#define ISNAIINTERRUPTACTIVE() (nai_statusbyte.p1int || nai_statusbyte.p2int || nai_statusbyte.p3int || nai_statusbyte.p4int)
+
 void nai_send_eepromcounterresponse(void);
 void nai_send_getstatusbyteresponse(void);
 void nai_usbpacket_received(nai_usbpacket_t *cmd);
