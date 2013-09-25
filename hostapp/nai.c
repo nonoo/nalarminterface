@@ -62,24 +62,30 @@ void nai_checkboard(void) {
 // This gets called when an alarm interrupt is received (one of the interrupt flags
 // were 1 in the received status byte).
 static void nai_gotinterrupt(nai_statusbyte_t statusbyte) {
+	static time_t lastrunonalarm = 0;
 	char *runonalarm = NULL;
 	char cmd[255] = {0};
 
 	printf("nai: got interrupt.\n");
-	runonalarm = config_get_runonalarm();
-	snprintf(cmd, sizeof(cmd), "%s %d %d %d %d %d %d %d %d", runonalarm,
-		statusbyte.p1state,
-		statusbyte.p1int,
-		statusbyte.p2state,
-		statusbyte.p2int,
-		statusbyte.p3state,
-		statusbyte.p3int,
-		statusbyte.p4state,
-		statusbyte.p4int);
-	printf("nai: executing: %s\n", cmd);
-	if (system(cmd) < 0)
-		fprintf(stderr, "nai error: error on exec.\n");
-	free(runonalarm);
+
+	if (time(NULL)-lastrunonalarm > config_get_runonalarmminimumdelayinsecbetweenruns()) {
+		runonalarm = config_get_runonalarm();
+		snprintf(cmd, sizeof(cmd), "%s %d %d %d %d %d %d %d %d", runonalarm,
+			statusbyte.p1state,
+			statusbyte.p1int,
+			statusbyte.p2state,
+			statusbyte.p2int,
+			statusbyte.p3state,
+			statusbyte.p3int,
+			statusbyte.p4state,
+			statusbyte.p4int);
+		printf("nai: executing: %s\n", cmd);
+		if (system(cmd) < 0)
+			fprintf(stderr, "nai error: error on exec.\n");
+		free(runonalarm);
+		lastrunonalarm = time(NULL);
+	} else
+		fprintf(stderr, "nai: minimum delay between onalarm runs not spent, not running command.\n");
 
 	nai_resetinterrupts();
 }
@@ -87,20 +93,25 @@ static void nai_gotinterrupt(nai_statusbyte_t statusbyte) {
 // This gets called when the EEPROM counter is increased (the received counter value
 // was greater than the stored one).
 static void nai_eepromcounterhasincreased(int newpage, int newaddress) {
+	static time_t lastrunoneepromcounterincrease = 0;
 	char *runoneepromcounterincrease = NULL;
 	char cmd[255] = {0};
 
 	printf("nai: eeprom counter has increased.\n");
-	runoneepromcounterincrease = config_get_runoneepromcounterincrease();
-	snprintf(cmd, sizeof(cmd), "%s %d %d %d %d", runoneepromcounterincrease,
-		newpage,
-		newaddress,
-		config_get_eepromcounter_page(),
-		config_get_eepromcounter_address());
-	printf("nai: executing: %s\n", cmd);
-	if (system(cmd) < 0)
-		fprintf(stderr, "nai error: error on exec.\n");
-	free(runoneepromcounterincrease);
+
+	if (time(NULL)-lastrunoneepromcounterincrease > config_get_runoneepromcounterincreaseminimumdelayinsecbetweenruns()) {
+		runoneepromcounterincrease = config_get_runoneepromcounterincrease();
+		snprintf(cmd, sizeof(cmd), "%s %d %d %d %d", runoneepromcounterincrease,
+			newpage,
+			newaddress,
+			config_get_eepromcounter_page(),
+			config_get_eepromcounter_address());
+		printf("nai: executing: %s\n", cmd);
+		if (system(cmd) < 0)
+			fprintf(stderr, "nai error: error on exec.\n");
+		free(runoneepromcounterincrease);
+	} else
+		fprintf(stderr, "nai: minimum delay between on eeprom counter increase runs not spent, not running command.\n");
 
 	// Storing the new EEPROM counter values.
 	config_set_eepromcounter_page(newpage);
