@@ -8,10 +8,10 @@ extern volatile nai_statusbyte_t nai_statusbyte;
 extern volatile nai_flags_t nai_flags;
 
 void naiboard_ports_readstatus(void) {
-	nai_statusbyte.p1state = (PORT_GetPortValue(&P1PORT) & P1PIN) ? 1 : 0;
-	nai_statusbyte.p2state = (PORT_GetPortValue(&P2PORT) & P2PIN) ? 1 : 0;
-	nai_statusbyte.p3state = (PORT_GetPortValue(&P3PORT) & P3PIN) ? 1 : 0;
-	nai_statusbyte.p4state = (PORT_GetPortValue(&P4PORT) & P4PIN) ? 1 : 0;
+	nai_statusbyte.p1state = (PORT_GetPortValue(&P1PORT) & P1PIN) ? 0 : 1;
+	nai_statusbyte.p2state = (PORT_GetPortValue(&P2PORT) & P2PIN) ? 0 : 1;
+	nai_statusbyte.p3state = (PORT_GetPortValue(&P3PORT) & P3PIN) ? 0 : 1;
+	nai_statusbyte.p4state = (PORT_GetPortValue(&P4PORT) & P4PIN) ? 0 : 1;
 }
 
 void naiboard_ports_init(void) {
