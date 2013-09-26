@@ -5,7 +5,7 @@
 
 #include <stdio.h>
 
-#define USB_BLINKRXTXLED() naiboard_state.usb_blinkrxtxledpulsecount = 5;
+#define USB_BLINKRXTXLED() naiboard_state.usb_blinkrxtxledpulsecount = 5
 
 usb_buf_t naiboard_usb_sendbuf;
 static usb_buf_t naiboard_usb_recvbuf;

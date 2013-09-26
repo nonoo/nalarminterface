@@ -28,7 +28,7 @@ void naiboard_rtc_init(void) {
 		// Wait until RTC is not busy.
     } while (RTC_Busy());
 
-    RTC_Initialize((uint16_t) 1024 / RTCCALLPERSEC, 0, 0, RTC_PRESCALER_DIV1_gc);
+    RTC_Initialize((uint16_t) 1024 / RTCCALLPERSEC, 0, 0, RTC_PRESCALER_DIV8_gc);
 
     // Enable overflow interrupt.
     RTC_SetIntLevels(RTC_OVFINTLVL_LO_gc, RTC_COMPINTLVL_OFF_gc);
