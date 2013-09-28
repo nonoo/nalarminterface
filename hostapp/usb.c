@@ -55,7 +55,7 @@ static void usb_send_int(uint8_t *data, int length) {
 	// USB communication is done using fixed-size packets.
 	if (length > sizeof(nai_usbpacket_t)) {
 		fprintf(stderr, "usb error: can't send int packet, length (%d) " \
-			"is larger than max usb packet size (%ld).\n", length, sizeof(nai_usbpacket_t));
+			"is larger than max usb packet size (%d).\n", length, sizeof(nai_usbpacket_t));
 		usb_state.error = 1;
 		return;
 	}
