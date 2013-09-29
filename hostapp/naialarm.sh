@@ -46,8 +46,8 @@ if [ ! -z $p2int ] && [ $p2int -eq 1 ]; then
 		echo "state on, sending alarm on email."
 		subject="[nai] RIASZTAS"
 		msg="Az otthoni riaszto bekapcsolt: `date`"
-		$scriptdir/mail.sh nonoo@nonoo.hu "$subject" "$msg"
-#		$scriptdir/mail.sh dianno@dianno.hu "$subject" "$msg"
+		$scriptdir/../mail/mail.sh nonoo@nonoo.hu "$subject" "$msg"
+#		$scriptdir/../mail/mail.sh dianno@dianno.hu "$subject" "$msg"
 	else
 		echo "state off, doing nothing."
 	fi
@@ -59,8 +59,8 @@ if [ ! -z $p3int ] && [ $p3int -eq 1 ]; then
 		echo "state on, sending sound alarm email."
 		subject="[nai] A hang erzekelo bekapcsolt"
 		msg="A szenzor hangot erzekelt: `date`"
-		$scriptdir/mail.sh nonoo@nonoo.hu "$subject" "$msg"
-#		$scriptdir/mail.sh dianno@dianno.hu "$subject" "$msg"
+		$scriptdir/../mail/mail.sh nonoo@nonoo.hu "$subject" "$msg"
+#		$scriptdir/../mail/mail.sh dianno@dianno.hu "$subject" "$msg"
 	else
 		echo "state off, doing nothing."
 	fi
