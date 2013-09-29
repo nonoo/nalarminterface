@@ -4,3 +4,4 @@ nai
 *.map
 *.o
 *.dep
+*.log
