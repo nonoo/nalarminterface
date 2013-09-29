@@ -48,8 +48,8 @@ gotopresetnr() {
 		return 1
 	fi
 
-	echo -n "setting PTZ to preset $HOMEPRESETNR1 ($PRESETNAME) on $IPPORT1..."
-	res=`curl -s "http://$IPPORT1/cgi-bin/CGIProxy.fcgi?cmd=ptzGotoPresetPoint&name=$PRESETNAME&usr=$user&pwd=$pass" | grep "<result>0</result>"`
+	echo -n "setting PTZ to preset $presetnr ($PRESETNAME) on $IPPORT..."
+	res=`curl -s "http://$ipport/cgi-bin/CGIProxy.fcgi?cmd=ptzGotoPresetPoint&name=$PRESETNAME&usr=$user&pwd=$pass" | grep "<result>0</result>"`
 	if [ -z "$res" ]; then
 		echo "error"
 		return 1
