@@ -1,2 +1,2 @@
-maxlogsizeinkb=1
+maxlogsizeinkb=1024
 keepcount=4
