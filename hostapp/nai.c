@@ -5,6 +5,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define CHECKBOARDTIMEOUTINSEC			3
 #define CHECKBOARDSENDPERIODINSEC		15
@@ -63,29 +64,32 @@ void nai_checkboard(void) {
 // were 1 in the received status byte).
 static void nai_gotinterrupt(nai_statusbyte_t statusbyte) {
 	static time_t lastrunonalarm = 0;
+	static nai_statusbyte_t laststatusbyte = {0};
 	char *runonalarm = NULL;
 	char cmd[255] = {0};
 
 	printf("nai: got interrupt.\n");
 
-	if (time(NULL)-lastrunonalarm > config_get_runonalarmminimumdelayinsecbetweenruns()) {
-		runonalarm = config_get_runonalarm();
-		snprintf(cmd, sizeof(cmd), "%s %d %d %d %d %d %d %d %d", runonalarm,
-			statusbyte.p1state,
-			statusbyte.p1int,
-			statusbyte.p2state,
-			statusbyte.p2int,
-			statusbyte.p3state,
-			statusbyte.p3int,
-			statusbyte.p4state,
-			statusbyte.p4int);
-		printf("nai: executing: %s\n", cmd);
-		if (system(cmd) < 0)
-			fprintf(stderr, "nai error: error on exec.\n");
-		free(runonalarm);
-		lastrunonalarm = time(NULL);
+	if (time(NULL)-lastrunonalarm > config_get_runonalarmminimumdelayinsecbetweenruns() ||
+		memcmp((uint8_t *)&statusbyte, (uint8_t *)&laststatusbyte, 1)) {
+			runonalarm = config_get_runonalarm();
+			snprintf(cmd, sizeof(cmd), "%s %d %d %d %d %d %d %d %d", runonalarm,
+				statusbyte.p1state,
+				statusbyte.p1int,
+				statusbyte.p2state,
+				statusbyte.p2int,
+				statusbyte.p3state,
+				statusbyte.p3int,
+				statusbyte.p4state,
+				statusbyte.p4int);
+			printf("nai: executing: %s\n", cmd);
+			if (system(cmd) < 0)
+				fprintf(stderr, "nai error: error on exec.\n");
+			free(runonalarm);
+			lastrunonalarm = time(NULL);
+			laststatusbyte = statusbyte;
 	} else
-		fprintf(stderr, "nai: minimum delay between onalarm runs not spent, not running command.\n");
+		fprintf(stderr, "nai: minimum delay between same onalarm runs not spent, not running command.\n");
 
 	nai_resetinterrupts();
 }
