@@ -9,9 +9,9 @@ I think the code is well commented and easily readable, so it can be a nice exam
 
 avrboard subdir
 ---------------
-This is the firmware for the atxmega128a3u board which can be bought at [100mhz.com](http://100mhz.com/avr-xmega-avr32/development-boards/avr-xmega128a3u-usb-development-mini-board-1089.html). The board can be programmed with an [AVR ISP programmer](http://100mhz.com/avr-xmega-avr32/programmer-debugger-socket-adapter/avr-programmer-usb-avrisp-xpii-avrisp-mkii-mk2-compliant-supports-xmega-pdi-951.html).
+This is the firmware for the atxmega128a3u board which can be bought at [100mhz.com](http://100mhz.com/avr-xmega-avr32/development-boards/avr-xmega128a3u-usb-development-mini-board-1089.html). The board can be programmed with an [AVR ISP programmer](http://100mhz.com/avr-xmega-avr32/programmer-debugger-socket-adapter/avr-programmer-usb-avrisp-xpii-avrisp-mkii-mk2-compliant-supports-xmega-pdi-951.html). Maybe the on-board factory USB bootloader can be used for programming as well, but I think the AVR Flip software is a crap on Linux.
 It watches 4 input pins and notifies the host application through USB if there was an interrupt.
-It has an UART serial console (can be used with a 3.3V UART-USB converter like [these](http://www.ebay.com/sch/i.html?_odkw=ftdi+3.3v&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR10.TRC0.A0.Xusb+serial+3.3v&_nkw=usb+serial+3.3v&_sacat=0).
+It has an UART serial console (can be used with a 3.3V UART-USB converter like [these](http://www.ebay.com/sch/i.html?_odkw=ftdi+3.3v&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR10.TRC0.A0.Xusb+serial+3.3v&_nkw=usb+serial+3.3v&_sacat=0)).
 Various debug commands can be used on the console (for the full list enter "help", or see console.c).
 If an interrupt happened, the status will be saved to the EEPROM, so if there's a power outage, the alarm will be delivered as soon as power comes back and the hostapp connects to the interface again. If there was an error with saving to the EEPROM (like the EEPROM location is faulty), the EEPROM location will be incremented by one, and the hostapp gets notified about this failure.
 
@@ -29,6 +29,8 @@ hostapp subdir
 --------------
 This is the host application which connects to the avrboard interface through USB, periodically checks the connection and waits for an interrupt.
 It starts a shell script when an interrupt happens or the EEPROM counter increases. These shell scripts can send emails or do other things.
+
+The hostapp application is meant to run on my Zyxel NSA-325 NAS with FFP, it can be easily compiled both to ARM and x86.
 
 logrotate subdir
 ----------------
