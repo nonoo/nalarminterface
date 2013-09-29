@@ -75,4 +75,6 @@ if [ ! -z $p4int ] && [ $p4int -eq 1 ]; then
 	fi
 fi
 
+$scriptdir/../logrotate/logrotateifneeded.sh $logfile
+
 echo "script finished."

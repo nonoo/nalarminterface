@@ -30,4 +30,6 @@ subject="[nai] EEPROM counter increased"
 msg="EEPROM counter increased at `date`.\n\nnewpage: $newpage\nnewaddr: $newaddr\noldpage: $oldpage\noldaddr: $oldaddr"
 $scriptdir/mail.sh nonoo@nonoo.hu "$subject" "$msg"
 
+$scriptdir/../logrotate/logrotateifneeded.sh $logfile
+
 echo "script finished."

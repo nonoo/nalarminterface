@@ -19,14 +19,14 @@ exec 1>&-
 exec 1>$logpipe
 exec 2>&1
 
-logfile=$1
+lf=$1
 
-if [ ! -f "$logfile" ]; then
-	echo "file \"$logfile\" doesn't exist."
+if [ ! -f "$lf" ]; then
+	echo "file \"$lf\" doesn't exist."
 	exit 1
 fi
 
-if [ `du $logfile | awk '{print $1}'` -gt $maxlogsizeinkb ]; then
-	echo "logfile \"$logfile\" is over size, needs rotating."
-	$scriptdir/logrotate.sh $logfile
+if [ `du $lf | awk '{print $1}'` -gt $maxlogsizeinkb ]; then
+	echo "logfile \"$lf\" is over size, needs rotating."
+	$scriptdir/logrotate.sh $lf
 fi

@@ -19,28 +19,30 @@ exec 1>&-
 exec 1>$logpipe
 exec 2>&1
 
-logfile=$1
+lf=$1
 
-if [ ! -f "$logfile" ]; then
-	echo "file \"$logfile\" doesn't exist."
+if [ ! -f "$lf" ]; then
+	echo "file \"$lf\" doesn't exist."
 	exit 1
 fi
 
-echo "rotating $logfile..."
-if [ -f $logfile.$keepcount ]; then
-	echo "  removing $logfile.$keepcount"
-	rm $logfile.$keepcount
+echo "rotating $lf..."
+if [ -f $lf.$keepcount ]; then
+	echo "  removing $lf.$keepcount"
+	rm $lf.$keepcount
 fi
 
 i=$((keepcount - 1))
 while [ $i -ge 0 ]; do
-	if [ -f $logfile.$i ]; then
-		echo "  moving $logfile.$i to $logfile.$((i + 1))"
-		mv $logfile.$i $logfile.$((i + 1))
+	if [ -f $lf.$i ]; then
+		echo "  moving $lf.$i to $lf.$((i + 1))"
+		mv $lf.$i $lf.$((i + 1))
 	fi
 	i=$((i - 1))
 done
 
-echo "  moving $logfile to $logfile.0"
-mv $logfile $logfile.0
+echo "  moving $lf to $lf.0"
+mv $lf $lf.0
 echo "  done."
+
+$scriptdir/../logrotate/logrotateifneeded.sh $logfile
