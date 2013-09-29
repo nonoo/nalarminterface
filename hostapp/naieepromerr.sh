@@ -1,7 +1,7 @@
 #!/bin/sh
 
 scriptdir=${0/`basename $0`/}
-logfile=`basename $0`.log
+logfile=$scriptdir/`basename $0`.log
 
 newpage=$1
 newaddr=$2
