@@ -73,6 +73,7 @@ void naiboard_usb_init_int_recv() {
 	naiboard_usb_vendor_int_in(UDD_EP_TRANSFER_OK, 0, 0);
 }
 
+// This gets called when the host opens the interface.
 bool naiboard_usb_vendor_enable(void) {
 	naiboard_state.usb_vendor_enabled = 1;
 	printf_P(PSTR("naiboard-usb: usb_vendor_enable();\n"));
@@ -80,6 +81,7 @@ bool naiboard_usb_vendor_enable(void) {
 	return true;
 }
 
+// This gets called when the host closes the interface.
 void naiboard_usb_vendor_disable(void) {
 	naiboard_state.usb_vendor_enabled = naiboard_state.usb_connected = 0;
 	printf_P(PSTR("naiboard-usb: usb_vendor_disable();\n"));
@@ -95,6 +97,7 @@ bool naiboard_usb_setup_in_received(void) {
 	return true;
 }
 
+// This gets called when the interface is plugged in or out to/from the host.
 void naiboard_usb_vbus_action(bool b_high) {
 	printf_P(PSTR("naiboard-usb: usb_vbus_action(%d);\n"), b_high);
 
@@ -107,10 +110,12 @@ void naiboard_usb_vbus_action(bool b_high) {
 	}
 }
 
+// This gets called when the USB line is suspended, so we can go to sleep etc.
 void naiboard_usb_suspend_action(void) {
 	printf_P(PSTR("naiboard-usb: usb_suspend_action();\n"));
 }
 
+// This gets called when the USB line is resumed, so we should expect data transfer etc.
 void naiboard_usb_resume_action(void) {
 	printf_P(PSTR("naiboard-usb: usb_resume_action();\n"));
 }

@@ -39,9 +39,11 @@ void naiboard_delay_us(uint16_t us) {
 }
 
 void naiboard_sleep(void) {
-	if (naiboard_state.usb_vendor_enabled)
+	if (naiboard_state.usb_vendor_enabled) // If we're not connected we won't go to sleep.
 		return;
 
+	// We're only using the IDLE sleep level because USB doesn't work below that.
+	// Not much power saving though...
 	SLEEP.CTRL = SLEEP_SMODE_IDLE_gc;
 
 	sysclk_disable_peripheral_clock(&RTC);
@@ -66,6 +68,8 @@ static void naiboard_enable_interrupts(void) {
 }
 
 void naiboard_init(void) {
+	// Setting up watchdog, so WDT_Reset() must be called at least
+	// every 2000 clock cycles.
 	WDT_EnableAndSetTimeout(WDT_PER_2KCLK_gc);
 
 	POWERSAVING_DISABLE_ALL_MODULES();
@@ -82,6 +86,7 @@ void naiboard_init(void) {
 	naiboard_eeprom_init();
 	naiboard_ports_init();
 
+	// Blink the LED so the user can see that we're alive :)
 	naiboard_led1_on();
 	naiboard_delay_ms(50);
 	naiboard_led1_off();

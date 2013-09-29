@@ -1,17 +1,26 @@
 #ifndef BOARDCONFIG_H_
 #define BOARDCONFIG_H_
 
+// This is the MCIU clock define needed by the sleep functions.
+// We're running at 48MHz because of the USB interface.
 #undef F_CPU
 #define F_CPU							48000000UL
+// The MCU has this much EEPROM pages and bytes per page.
 #define EEPROMBYTESPERPAGE				16
 #define EEPROMPAGECOUNT					128
+// How many times the RTC interrupt will be called in a second.
 #define RTCCALLPERSEC					10
+// If an interrupt is active, send the status byte to the host on every nth
+// RTC interrupt call.
 #define STATUSBYTESENDINTERVALINTICKS	3
+// This many characters can be entered to the command line.
 #define STDINBUFFERSIZE					25
 
+// The interface's self-assigned dummy VID and PID.
 #define USB_VID							0x4566
 #define USB_PID							0x0000
 
+// The console's USART module's location and pins.
 #define USARTMODULE						USARTE0
 #define USARTMODULERXCINTVECT			USARTE0_RXC_vect
 #define USARTMODULEDREINTVECT			USARTE0_DRE_vect
@@ -19,9 +28,11 @@
 #define USARTRXPIN						PIN2_bm
 #define USARTTXPIN						PIN3_bm
 
+// We only have 1 LED on the board.
 #define LED1PORT						PORTA
 #define LED1PIN							PIN0_bm
 
+// The following defines are the settings for the 4 inputs (P1-P4).
 #define P1PORT							PORTF
 #define P1PIN							PIN6_bm
 #define P1INTLVL						PORT_INT0LVL_MED_gc

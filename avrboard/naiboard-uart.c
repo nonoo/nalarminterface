@@ -61,16 +61,17 @@ void naiboard_process_stdin(void) {
 	}
 }
 
+// These two interrupt handlers are needed by the AVR USART driver.
 ISR(USARTMODULEDREINTVECT) {
 	USART_DataRegEmpty(&naiboard_uart);
 }
-
 ISR(USARTMODULERXCINTVECT) {
 	USART_RXComplete(&naiboard_uart);
 }
 
 void naiboard_uart_init(void) {
 	sysclk_enable_peripheral_clock(&USARTMODULE);
+	// We're only using the stdout, stdin is handled by the AVR USART driver.
     stdout = &mystdout;
 
 	PORT_SetPinsAsOutput(&USARTPORT, USARTTXPIN);
