@@ -1,9 +1,8 @@
 #ifndef TYPES_H_
 #define TYPES_H_
 
-#include <stdint.h>
+#include "../common/types.h"
 
-typedef uint8_t flag_t;
 typedef uint8_t timestamp_t;
 
 typedef struct {

@@ -1,6 +1,8 @@
 #ifndef USBPROTOCOL_H_
 #define USBPROTOCOL_H_
 
+// This is the status byte which holds the pins state. This gets sent to the
+// host application and stored in the EEPROM as well.
 typedef struct {
 	uint8_t p1state : 1; // This is 1 if P1 is 1
 	uint8_t p1int 	: 1; // This is 1 if there was an interrupt on P1

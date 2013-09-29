@@ -209,6 +209,7 @@ static flag_t usb_initreceivecallback(void) {
 	return 1;
 }
 
+// These callbacks are used by libusb to add it's file descriptors to the watched poll() set.
 static void usb_pollfd_added_cb(int fd, short events, void *user_data) {
 	daemon_poll_addfd(fd, events);
 }
@@ -364,6 +365,7 @@ flag_t usb_process(void) {
 		return 0;
 
 	if (!usb_state.connected && !usb_state.checkboardsent && usb_state.initfinished) {
+		// After connecting the interface, the first packet should be a checkboard packet.
 		printf("usb: interface initialized, sending checkboard command.\n");
 		usbpacket.type = NAI_USBPACKET_TYPE_CHECKBOARD;
 		usb_send_int((uint8_t *)&usbpacket, sizeof(nai_usbpacket_t));
@@ -378,7 +380,7 @@ flag_t usb_process(void) {
 			usb_state.error = 1;
 			return 0;
 		}
-		if (libusb_get_next_timeout(usb_ctx, &tv))
+		if (libusb_get_next_timeout(usb_ctx, &tv)) // A specified timeout needed by libusb?
 			daemon_poll_setmaxtimeout(tv.tv_sec * 1000 + tv.tv_usec / 1000.0);
 	}
 

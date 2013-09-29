@@ -1,9 +1,7 @@
 #ifndef TYPES_H_
 #define TYPES_H_
 
-#include <stdint.h>
-
-typedef uint8_t flag_t;
+#include "../common/types.h"
 
 typedef struct {
 	flag_t sigexit;
