@@ -1,6 +1,7 @@
 #include "boardconfig.h"
 
 #include "types.h"
+#include "../common/usbprotocol.h"
 
 #include <avr/port_driver.h>
 

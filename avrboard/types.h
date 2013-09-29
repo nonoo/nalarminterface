@@ -16,6 +16,4 @@ typedef struct {
 	uint8_t usb_ledstate : 1;
 } naiboard_state_t;
 
-#include "../common/usbprotocol.h"
-
 #endif

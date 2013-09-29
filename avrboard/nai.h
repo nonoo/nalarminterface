@@ -2,6 +2,7 @@
 #define NAI_H_
 
 #include "types.h"
+#include "../common/usbprotocol.h"
 
 #define ISNAIINTERRUPTACTIVE() (nai_statusbyte.p1int || nai_statusbyte.p2int || nai_statusbyte.p3int || nai_statusbyte.p4int)
 
