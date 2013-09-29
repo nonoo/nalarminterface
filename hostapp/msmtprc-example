@@ -1,0 +1,6 @@
+account mailserver1
+host smtp.bar.com
+from foo@bar.com
+auth on
+user "foo@bar.com"
+password abcd123
