@@ -10,7 +10,7 @@ As I have a Zyxel NSA325 NAS with [FFP](http://zyxel.nas-central.org/wiki/FFP_as
 About the AVR board
 -------------------
 
-The alarm system has two wire outputs which have +13.5V on them if there's an alarm or if the system is armed. I also have an [EP98 sound detection sensor](http://www.ebay.com/sch/i.html?_odkw=ep98+sound&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR0.TRC0.Xep98+sound+detection+sensor&_nkw=ep98+sound+detection+sensor&_sacat=0) which outputs 5V and 0V when a loud enough sound is detected. These 3 wires are connected to an [atxmega128a3u development board](http://100mhz.com/avr-xmega-avr32/development-boards/avr-xmega128a3u-usb-development-mini-board-1089.html) through optocouplers.
+The alarm system has two wire outputs which have +13.5V on them if there's an alarm or if the system is armed. I also have an [EP98 sound detection sensor](http://www.ebay.com/sch/i.html?_odkw=ep98+sound&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR0.TRC0.Xep98+sound+detection+sensor&_nkw=ep98+sound+detection+sensor&_sacat=0) which outputs 5V and 0V when a loud enough sound is detected. These 3 wires are connected to an [atxmega128a3u development board](http://100mhz.com/avr-xmega-avr32/development-boards/avr-xmega128a3u-usb-development-mini-board-1089.html) through optocouplers:
 
 --- TODO here comes the schematic of an optocoupler unit ---
 
@@ -39,8 +39,7 @@ The sources in this directory are used both by the avrboard and the hostapp.
 foscamctrl subdir
 -----------------
 These scripts can be used to control Foscam 9820W V2 IP cameras.
-The documentaion of the used API can be found here:
-http://foscam.us/forum/cgi-sdk-for-hd-camera-t6045.html
+The documentaion of the used API can be found [here](http://foscam.us/forum/cgi-sdk-for-hd-camera-t6045.html).
 
 hostapp subdir
 --------------
