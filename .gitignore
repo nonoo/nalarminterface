@@ -5,3 +5,4 @@ nai
 *.o
 *.dep
 *.log
+*.log.*
