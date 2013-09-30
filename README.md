@@ -5,7 +5,7 @@ This is the application package for my alarm system interface. It consist of a f
 
 ![nai overview](https://raw.github.com/nonoo/nalarminterface/master/contrib/systemoverview.png)
 
-As I have a Zyxel NSA325 NAS with [FFP](http://zyxel.nas-central.org/wiki/FFP_as_zypkg) running 24/7, the alarm interface and the TC35 GSM module are connected to it via USB.
+As I have a Zyxel NSA325 NAS with [FFP](http://zyxel.nas-central.org/wiki/FFP_as_zypkg) running 24/7, the alarm interface and the TC35 GSM module are connected to it via USB. See [this guide](http://dp.nonoo.hu/installing-ffp-on-zyxel-nsa325/) for installing FFP on this NAS.
 
 About the AVR board
 -------------------
