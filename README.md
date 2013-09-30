@@ -1,3 +1,6 @@
+What's nalarminterface?
+=======================
+
 This is the application package for my alarm system interface. It consist of a firmware, host application, and various (mostly shell script) tools. I made nai (short for nalarminterface) to be able to interact with my alarm box in my house, send an email if there was an alarm, turn on/off the motion detecion in the IP cameras if the alarm is armed or disarmed etc.
 
 ![nai overview](https://raw.github.com/nonoo/nalarminterface/master/contrib/systemoverview.png)
