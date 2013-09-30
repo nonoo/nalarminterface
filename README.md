@@ -12,9 +12,9 @@ About the AVR board
 
 The alarm system has two wire outputs which have +13.5V on them if there's an alarm or if the system is armed. I also have an [EP98 sound detection sensor](http://www.ebay.com/sch/i.html?_odkw=ep98+sound&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR0.TRC0.Xep98+sound+detection+sensor&_nkw=ep98+sound+detection+sensor&_sacat=0) which outputs 5V and 0V when a loud enough sound is detected. These 3 wires are connected to an [atxmega128a3u development board](http://100mhz.com/avr-xmega-avr32/development-boards/avr-xmega128a3u-usb-development-mini-board-1089.html) through optocouplers:
 
-![Schematic of an optocoupler section](https://raw.github.com/nonoo/nalarminterface/master/contrib/optocoupler.png)
+![Schematic of an optocoupler unit](https://raw.github.com/nonoo/nalarminterface/master/contrib/optocoupler.png)
 
-There are 4 optocoupler units on the AVR board:
+There are 4 of these optocoupler units on the AVR board:
 
 ![AVR board](https://raw.github.com/nonoo/nalarminterface/master/contrib/avrboard.jpg)
 
