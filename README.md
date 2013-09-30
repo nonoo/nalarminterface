@@ -1,6 +1,3 @@
-nalarminterface
-===============
-
 This is the application package for my alarm system interface. It consist of a firmware, host application, and various (mostly shell script) tools. I made nai (short for nalarminterface) to be able to interact with my alarm box in my house, send an email if there was an alarm, turn on/off the motion detecion in the IP cameras if the alarm is armed or disarmed etc.
 
 ![nai overview](https://raw.github.com/nonoo/nalarminterface/master/contrib/systemoverview.png)
@@ -8,7 +5,7 @@ This is the application package for my alarm system interface. It consist of a f
 As I have a Zyxel NSA325 NAS with [FFP](http://zyxel.nas-central.org/wiki/FFP_as_zypkg) running 24/7, the alarm interface and the TC35 GSM module are connected to it via USB. See [this guide](http://dp.nonoo.hu/installing-ffp-on-zyxel-nsa325/) for installing FFP on this NAS.
 
 About the AVR board
--------------------
+===================
 
 The alarm system has two wire outputs which have +13.5V on them if there's an alarm or if the system is armed. I also have an [EP98 sound detection sensor](http://www.ebay.com/sch/i.html?_odkw=ep98+sound&_osacat=0&_from=R40&_trksid=p2045573.m570.l1313.TR0.TRC0.Xep98+sound+detection+sensor&_nkw=ep98+sound+detection+sensor&_sacat=0) which outputs 5V and 0V when a loud enough sound is detected. These 3 wires are connected to an [atxmega128a3u development board](http://100mhz.com/avr-xmega-avr32/development-boards/avr-xmega128a3u-usb-development-mini-board-1089.html) through optocouplers:
 
@@ -23,6 +20,9 @@ Here's the input connection schematic of the board:
 ![AVR board input schematics](https://raw.github.com/nonoo/nalarminterface/master/contrib/avrboardinputs.png)
 
 I think the code is well commented and easily readable, so it can be a nice example for using USB on the xmega with libusb on the host. EEPROM reading/writing, interrupt driven UART console, RTC (for tracking elapsed time and blinking the LED), ADC (for reading the uC VCC) and - of course - GPIO pin interrupt watch are used as well.
+
+Info about the subdirectories
+=============================
 
 avrboard subdir
 ---------------
