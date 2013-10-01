@@ -6,11 +6,12 @@
 binary="nai"
 mailto="nonoo@nonoo.hu"
 minmailsendintervalinseconds=600
-scriptdir=${0/`basename $0`/}
-logfile=$scriptdir/`basename $0`.log
+scriptname=`basename $0`
+scriptdir=${0/$scriptname/}
+logfile=$scriptdir/$scriptname.log
 
 # This section redirects stdout to a file and timestamps every line.
-logpipe=/tmp/`basename $0`.pipe
+logpipe=/tmp/$scriptname.pipe
 rm -f $logpipe
 # Setting up a trap to delete the pipe on exit
 trap "rm -f $logpipe" EXIT

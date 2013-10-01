@@ -2,7 +2,8 @@
 
 # This script sets all cameras PTZ to the home position.
 
-scriptdir=${0/`basename $0`/}
+scriptname=`basename $0`
+scriptdir=${0/$scriptname/}
 source $scriptdir/config
 
 getactivesessions() {

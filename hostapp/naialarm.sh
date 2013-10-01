@@ -1,7 +1,8 @@
 #!/bin/sh
 
-scriptdir=${0/`basename $0`/}
-logfile=$scriptdir/`basename $0`.log
+scriptname=`basename $0`
+scriptdir=${0/$scriptname/}
+logfile=$scriptdir/$scriptname.log
 
 p1state=$1
 p1int=$2
@@ -13,7 +14,7 @@ p4state=$7
 p4int=$8
 
 # This section redirects stdout to a file and timestamps every line.
-logpipe=/tmp/`basename $0`.pipe
+logpipe=/tmp/$scriptname.pipe
 rm -f $logpipe
 # Setting up a trap to delete the pipe on exit
 trap "rm -f $logpipe" EXIT

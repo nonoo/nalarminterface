@@ -3,7 +3,8 @@
 # This script sets motion detection alarm on (1) or off (0) on the Foscam cameras.
 # Usage: ./foscam-setalarm [1|0]
 
-scriptdir=${0/`basename $0`/}
+scriptname=`basename $0`
+scriptdir=${0/$scriptname/}
 source $scriptdir/config
 
 setalarm() {

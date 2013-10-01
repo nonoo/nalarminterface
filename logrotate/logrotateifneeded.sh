@@ -1,11 +1,12 @@
 #!/bin/sh
 
-scriptdir=${0/`basename $0`/}
+scriptname=`basename $0`
+scriptdir=${0/$scriptname/}
 logfile=$scriptdir/logrotate.log
 
 source $scriptdir/config
 
-logpipe=/tmp/`basename $0`.pipe
+logpipe=/tmp/$scriptname.pipe
 rm -f $logpipe
 # Setting up a trap to delete the pipe on exit
 trap "rm -f $logpipe" EXIT
