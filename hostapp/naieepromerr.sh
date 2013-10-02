@@ -5,7 +5,7 @@ scriptdir=${0/$scriptname/}
 logfile=$scriptdir/$scriptname.log
 
 source $scriptdir/$scriptname-config
-source $scriptdir/redirectlog.src.sh
+source $scriptdir/../common/redirectlog.src.sh
 
 newpage=$1
 newaddr=$2

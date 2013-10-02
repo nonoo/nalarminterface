@@ -5,7 +5,7 @@ scriptdir=${0/$scriptname/}
 logfile=$scriptdir/logrotate.log
 
 source $scriptdir/config
-source $scriptdir/../hostapp/redirectlog.src.sh
+source $scriptdir/../common/redirectlog.src.sh
 
 lf=$1
 

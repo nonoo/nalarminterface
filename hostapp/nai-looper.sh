@@ -11,7 +11,7 @@ scriptdir=${0/$scriptname/}
 logfile=$scriptdir/$scriptname.log
 
 source $scriptdir/$scriptname-config
-source $scriptdir/redirectlog.src.sh
+source $scriptdir/../common/redirectlog.src.sh
 
 lastmailsentat=0
 while [ 1 ]; do
