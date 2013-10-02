@@ -1,3 +1,6 @@
+# This script redirects stdout to a file and timestamps every line.
+# The script should be sourced, not executed directly.
+
 if [ -z "$scriptname" ]; then
 	echo "redirectlog error: no scriptname given."
 	exit 1
@@ -8,7 +11,6 @@ if [ -z "$logfile" ]; then
 	exit 1
 fi
 
-# This script redirects stdout to a file and timestamps every line.
 logpipe=/tmp/$scriptname.pipe
 rm -f $logpipe
 # Setting up a trap to delete the pipe on exit
