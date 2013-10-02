@@ -5,7 +5,7 @@ scriptdir=${0/$scriptname/}
 logfile=$scriptdir/$scriptname.log
 
 source $scriptdir/$scriptname-config
-source $scriptdir/../common/redirectlog.src.sh
+source $redirectlogscript
 
 p1state=$1
 p1int=$2
@@ -64,6 +64,6 @@ if [ ! -z $p4int ] && [ $p4int -eq 1 ]; then
 	fi
 fi
 
-$scriptdir/../logrotate/logrotateifneeded.sh $logfile
+$logrotateifneeded $logfile
 
 echo "script finished."

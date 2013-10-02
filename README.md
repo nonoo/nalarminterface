@@ -51,10 +51,6 @@ It starts a shell script when an interrupt happens or the EEPROM counter increas
 
 The hostapp application is meant to run on my Zyxel NSA-325 NAS with FFP, it can be easily compiled both to ARM and x86.
 
-logrotate subdir
-----------------
-All shell scripts log to their current subdirectory. After they are finished, these logrotate scripts can be used to limit their log files size.
-
 mail subdir
 -----------
 The script here can be used as a wrapper for msmtp to easily send emails.

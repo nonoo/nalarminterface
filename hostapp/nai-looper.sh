@@ -9,7 +9,7 @@ logfile=$scriptdir/$scriptname.log
 binarylogfile=$scriptdir/$binary.log
 
 source $scriptdir/$scriptname-config
-source $scriptdir/../common/redirectlog.src.sh
+source $redirectlogscript
 
 lastmailsentat=0
 while [ 1 ]; do
@@ -29,8 +29,8 @@ while [ 1 ]; do
 		fi
 	fi
 
-	$scriptdir/../logrotate/logrotateifneeded.sh $logfile
-	$scriptdir/../logrotate/logrotateifneeded.sh $binarylogfile
+	$logrotateifneeded $logfile
+	$logrotateifneeded $binarylogfile
 
 	sleep 1
 done

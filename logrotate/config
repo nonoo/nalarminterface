@@ -1,4 +1,0 @@
-maxlogsizeinkb=100
-keepcount=2
-logfile=/tmp/tmpfs/$scriptname.log
-redirectlogscriptpath=$scriptdir/../common/redirectlog.src.sh
