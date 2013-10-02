@@ -7,6 +7,8 @@ This is the application package for my alarm system interface. It consist of a f
 
 As I have a Zyxel NSA325 NAS with [FFP](http://zyxel.nas-central.org/wiki/FFP_as_zypkg) running 24/7, the alarm interface and the TC35 GSM module are connected to it via USB. See [this guide](http://dp.nonoo.hu/installing-ffp-on-zyxel-nsa325/) for installing FFP on this NAS.
 
+The shell scripts need my logrotate script which can be found in a separate git repo [here](https://github.com/nonoo/logrotate).
+
 About the AVR board
 ===================
 
