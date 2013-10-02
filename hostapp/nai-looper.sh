@@ -3,12 +3,10 @@
 # This script can be used to start the host app. It restarts it if it isn't
 # running and sends an email notification about the event.
 
-binary="nai"
-mailto="nonoo@nonoo.hu"
-minmailsendintervalinseconds=600
 scriptname=`basename $0`
 scriptdir=${0/$scriptname/}
 logfile=$scriptdir/$scriptname.log
+binarylogfile=$scriptdir/$binary.log
 
 source $scriptdir/$scriptname-config
 source $scriptdir/../common/redirectlog.src.sh
@@ -17,7 +15,7 @@ lastmailsentat=0
 while [ 1 ]; do
 	if [ -z "`pidof $binary`" ]; then
 		echo "$binary not found, restarting."
-		$scriptdir/$binary 2>&1 | awk '{ print strftime("[%Y/%m/%d %H:%M:%S]"), $0; }' >> $binary.log &
+		$scriptdir/$binary 2>&1 | awk '{ print strftime("[%Y/%m/%d %H:%M:%S]"), $0; }' >> $binarylogfile &
 
 		currdate=`date +%s`
 		if [ $((currdate - $lastmailsentat)) -gt $minmailsendintervalinseconds ]; then
@@ -32,7 +30,7 @@ while [ 1 ]; do
 	fi
 
 	$scriptdir/../logrotate/logrotateifneeded.sh $logfile
-	$scriptdir/../logrotate/logrotateifneeded.sh $binary.log
+	$scriptdir/../logrotate/logrotateifneeded.sh $binarylogfile
 
 	sleep 1
 done
