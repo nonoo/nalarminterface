@@ -1,3 +1,13 @@
+if [ -z "$scriptname" ]; then
+	echo "redirectlog error: no scriptname given."
+	exit 1
+fi
+
+if [ -z "$logfile" ]; then
+	echo "redirectlog error: no logfile name given."
+	exit 1
+fi
+
 # This script redirects stdout to a file and timestamps every line.
 logpipe=/tmp/$scriptname.pipe
 rm -f $logpipe
