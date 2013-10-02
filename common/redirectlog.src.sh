@@ -11,6 +11,9 @@ if [ -z "$logfile" ]; then
 	exit 1
 fi
 
+# Creating the directory for the logfile if it doesn't exist
+mkdir -p `dirname $logfile`
+
 logpipe=/tmp/$scriptname.pipe
 rm -f $logpipe
 # Setting up a trap to delete the pipe on exit

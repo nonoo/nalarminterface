@@ -1,1 +1,1 @@
-logfile=/tmp/$scriptname.log
+logfile=/tmp/tmpfs/log/$scriptname.log
