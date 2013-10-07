@@ -59,4 +59,4 @@ The script here can be used as a wrapper for msmtp to easily send emails.
 
 tc35 subdir
 -----------
-TODO
+I'm using a Siemens TC35 GSM module for sending an SMS when there's an alarm. The module needs it's IGN pin to be pulled down to GND for at least 100ms and then released to start working after powering on, so I had to build a little circuit with an ATtiny25 MCU which does that. The source code for the "igniter" MCU is in the tc35/igniter folder.
