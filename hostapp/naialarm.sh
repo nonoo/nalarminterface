@@ -34,8 +34,8 @@ if [ ! -z $p2int ] && [ $p2int -eq 1 ]; then
 	if [ $p2state -eq 1 ]; then
 		echo "state on, sending alarm on sms."
 		msg="RIASZTAS, az otthoni riaszto bekapcsolt: `date`"
-		echo $msg | $smsdinject -c $scriptdir/../tc35/smsdrc TEXT $smsto1
-		echo $msg | $smsdinject -c $scriptdir/../tc35/smsdrc TEXT $smsto2
+#		echo $msg | $smsdinject -c $scriptdir/../tc35/smsdrc TEXT $smsto1
+#		echo $msg | $smsdinject -c $scriptdir/../tc35/smsdrc TEXT $smsto2
 
 		echo "state on, sending alarm on email."
 		subject="[nai] RIASZTAS"
