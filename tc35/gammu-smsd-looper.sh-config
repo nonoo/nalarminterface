@@ -1,0 +1,9 @@
+binarypath=/ffp/bin
+binary="gammu-smsd"
+binaryparams="-c $scriptdir/smsdrc"
+mailto="nonoo@nonoo.hu"
+minmailsendintervalinseconds=600
+logfile=/tmp/tmpfs/log/$scriptname.log
+binarylogfile=/tmp/tmpfs/log/$binary.log
+redirectlogscript=/ffp/home/admin/logrotate/redirectlog.src.sh
+logrotateifneeded=/ffp/home/admin/logrotate/logrotateifneeded.sh

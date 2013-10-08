@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# This script can be used to start the host app. It restarts it if it isn't
+# This script can be used to start gammu-smsd. It restarts it if it isn't
 # running and sends an email notification about the event.
 
 scriptname=`basename $0`
@@ -14,7 +14,7 @@ lastmailsentat=0
 while [ 1 ]; do
 	if [ -z "`pidof $binary`" ]; then
 		echo "$binary not found, restarting."
-		$scriptdir/$binary 2>&1 | awk '{ print strftime("[%Y/%m/%d %H:%M:%S]"), $0; }' >> $binarylogfile &
+		$binarypath/$binary $binaryparams 2>&1 | awk '{ print strftime("[%Y/%m/%d %H:%M:%S]"), $0; }' >> $binarylogfile &
 
 		currdate=`date +%s`
 		if [ $((currdate - $lastmailsentat)) -gt $minmailsendintervalinseconds ]; then
