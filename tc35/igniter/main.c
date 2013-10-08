@@ -15,19 +15,15 @@
 int main() {
 	DDRB |= (1 << PB3); // Pin 2 output
 
-	_delay_ms(1000);
-	IGNITEON();
 	_delay_ms(200);
-	IGNITEOFF();
-
-/*	while (1) { // Cuckoo clock for testing ;)
+	while (1) {
 		IGNITEON();
-		_delay_ms(1000);
+		_delay_ms(200);
 		IGNITEOFF();
 		_delay_ms(1000);
-	}*/
+	}
 
-	while (1) {
+/*	while (1) {
 		// Enabling sleep (this is just enabling, not switching to sleep state)
 		sleep_enable();
 		// Turning off all modules.
@@ -40,7 +36,7 @@ int main() {
 		MCUCR &= ~0b00000100;
 		// BOD sleep is active for only 3 clock cycles so we have to go to sleep now.
 		sleep_cpu();
-	}
+	}*/
 
 	return 0;
 }
