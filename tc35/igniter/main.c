@@ -1,7 +1,6 @@
 // The TC35's IGN pin needs to be pulled low for at least 100ms after power is
 // on. The module is only starting normal working mode when the IGN pin is
-// released. The igniter circuit does this IGN pulldown after power is on,
-// and then goes to sleep to minimize power consumption.
+// released. The igniter circuit does this IGN pulldown periodically.
 
 #define F_CPU 1000000UL
 

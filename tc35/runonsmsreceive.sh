@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# This script gets called when gammu-smsd receives an SMS.
+# It then sends the received message to the given email address.
+
 scriptname=`basename $0`
 scriptdir=${0/$scriptname/}
 logfile=$scriptdir/$scriptname.log
