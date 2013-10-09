@@ -10,6 +10,11 @@ logfile=$scriptdir/$scriptname.log
 source $scriptdir/$scriptname-config
 source $redirectlogscript
 
+mkdir -p $smsdir/error
+mkdir -p $smsdir/inbox
+mkdir -p $smsdir/outbox
+mkdir -p $smsdir/sent
+
 lastmailsentat=0
 while [ 1 ]; do
 	if [ -z "`pidof $binary`" ]; then
