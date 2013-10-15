@@ -12,6 +12,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+extern volatile nai_statusbyte_t nai_statusbyte;
+
 int main() {
 	naiboard_init();
 
