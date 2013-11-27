@@ -10,7 +10,7 @@ typedef struct {
 } nai_flags_t;
 
 typedef struct {
-	uint16_t usb_blinkrxtxledpulsecount;
+	uint8_t usb_blinkrxtxledpulsecount;
 	uint8_t usb_connected : 1;
 	uint8_t usb_vendor_enabled : 1;
 	uint8_t usb_ledstate : 1;
