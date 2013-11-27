@@ -11,7 +11,7 @@ extern volatile nai_flags_t nai_flags;
 void naiboard_ports_readstatus(void) {
 	// Inputs are inverted because of the pullup.
 	// Of course we could set the pins as inverted using PORT_ConfigurePins() but
-	// I think this was it's more straightforward :)
+	// I think this way it's more straightforward :)
 	nai_statusbyte.p1state = (PORT_GetPortValue(&P1PORT) & P1PIN) ? 0 : 1;
 	nai_statusbyte.p2state = (PORT_GetPortValue(&P2PORT) & P2PIN) ? 0 : 1;
 	nai_statusbyte.p3state = (PORT_GetPortValue(&P3PORT) & P3PIN) ? 0 : 1;
