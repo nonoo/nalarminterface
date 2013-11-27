@@ -54,7 +54,7 @@
 #define P3INTVECT						PORTE_INT0_vect
 #define P3INTCONFIG(a, b, c)			PORT_ConfigureInterrupt0(a, b, c)
 
-#define P4PORT							PORTE
+#define P4PORT							PORTB
 #define P4PIN							PIN6_bm
 #define P4INTLVL						PORT_INT1LVL_MED_gc
 #define P4INTLVL_OFF					PORT_INT1LVL_OFF_gc
