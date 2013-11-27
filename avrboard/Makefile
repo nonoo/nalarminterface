@@ -21,9 +21,10 @@ OBJCOPY=avr-objcopy
 OBJDUMP=avr-objdump
 SIZE=avr-size
 AVRDUDE=avrdude
+DFUPROGRAMMER=dfu-programmer
 REMOVE=rm -f
 
-LDFLAGS=-Wl,-Map,$(TARGET).map -mmcu=$(MCU) $(LIBS) -Wl,--section-start=.BOOT=0x10000
+LDFLAGS=-Wl,-Map,$(TARGET).map -mmcu=$(MCU) $(LIBS)
 
 CFLAGS=-I. $(INC) -g -mmcu=$(MCU) -Os \
 	-fpack-struct -fshort-enums \
@@ -57,7 +58,15 @@ readeeprom:
 erase:
 	$(AVRDUDE) -c $(AVRDUDE_PROGRAMMERID) -p $(AVRDUDEMCU) -P $(AVRDUDE_PORT) -e
 
-install: hex readeeprom erase writeflash
+ispinstall: hex readeeprom erase writeflash
+
+install: erasedfu writedfu
+
+erasedfu:
+	$(DFUPROGRAMMER) $(MCU) erase
+
+writedfu: hex
+	$(DFUPROGRAMMER) $(MCU) flash $(TARGET).hex
 
 clean:
 	rm -f $(MODULES:.S=.o) *.out *.hex *.lst *.out.map *.map $(TARGET) $(DEPFILE)
