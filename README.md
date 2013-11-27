@@ -24,6 +24,10 @@ Here's the input connection schematic of the board:
 
 ![AVR board input schematics](https://raw.github.com/nonoo/nalarminterface/master/contrib/avrboardinputs.png)
 
+Note that P4's optocoupler is not used, a sound detector is connected to the MCU instead. Here's the sound detector's interface:
+
+![Sound detector interface schematics](https://raw.github.com/nonoo/nalarminterface/master/contrib/sounddetectorinterface.png)
+
 I think the code is well commented and easily readable, so it can be a nice example for using USB on the xmega with libusb on the host. EEPROM reading/writing, interrupt driven UART console, RTC (for tracking elapsed time and blinking the LED), ADC (for reading the uC VCC) and - of course - GPIO pin interrupt watch are used as well.
 
 Info about the subdirectories
