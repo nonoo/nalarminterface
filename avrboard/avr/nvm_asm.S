@@ -25,7 +25,7 @@ END_FUNC(nvm_read_byte)
 /**
  * \brief Perform SPM command
  */
-PUBLIC_FUNCTION_SEGMENT(nvm_common_spm, BOOT)
+PUBLIC_FUNCTION(nvm_common_spm)
 
 /**
  * For GCC:
@@ -51,7 +51,7 @@ END_FUNC(nvm_common_spm)
  * \brief Load byte to page buffer
  *
  */
-PUBLIC_FUNCTION_SEGMENT(nvm_flash_load_word_to_buffer, BOOT)
+PUBLIC_FUNCTION(nvm_flash_load_word_to_buffer)
 
 /**
  * For GCC:
