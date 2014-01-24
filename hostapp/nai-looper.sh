@@ -7,6 +7,8 @@ scriptname=`basename $0`
 scriptdir=${0/$scriptname/}
 logfile=$scriptdir/$scriptname.log
 
+cd $scriptdir
+
 source $scriptdir/$scriptname-config
 source $redirectlogscript
 

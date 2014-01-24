@@ -58,7 +58,7 @@ fi
 
 if [ ! -z $p4int ] && [ $p4int -eq 1 ]; then
 	echo -n "interrupt on p4 - "
-	if [ $p4state -eq 1 ]; then
+	if [ $p4state -eq 0 ]; then
 		echo "state on, sending sound alarm email."
 		subject="[nai] A hang erzekelo bekapcsolt"
 		msg="A szenzor hangot erzekelt: `date`"

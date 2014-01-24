@@ -16,13 +16,12 @@ start_cmd="nai_start"
 stop_cmd="nai_stop"
 
 nai_start() {
-	echo starting nai
 	proc_start_bg $command
 }
 
 nai_stop() {
-	echo stopping nai
 	proc_stop $command
+	killall nai
 }
 
 run_rc_command "$1"
