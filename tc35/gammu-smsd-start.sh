@@ -18,12 +18,10 @@ stop_cmd="gammu_smsd_stop"
 gammu_smsd_start() {
 	echo loading serial adapter kernel module
 	modprobe ch341
-	echo starting gammu-smsd
 	proc_start_bg $command
 }
 
 gammu_smsd_stop() {
-	echo stopping gammu-smsd
 	proc_stop $command
 	killall gammu-smsd-looper.sh
 	killall gammu-smsd
