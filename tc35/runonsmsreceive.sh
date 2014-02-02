@@ -10,6 +10,9 @@ logfile=$scriptdir/$scriptname.log
 source $scriptdir/$scriptname-config
 source $redirectlogscript
 
+quietmode=1
+redirectlog
+
 echo "script started with parameters \"$*\"."
 
 for id in "$@"; do
@@ -26,6 +29,6 @@ for id in "$@"; do
 	$scriptdir/../mail/mail.sh $mailto "$subject" "$msg"
 done
 
-$logrotateifneeded $logfile
+checklogsize
 
 echo "script finished."

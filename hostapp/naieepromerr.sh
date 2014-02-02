@@ -7,6 +7,9 @@ logfile=$scriptdir/$scriptname.log
 source $scriptdir/$scriptname-config
 source $redirectlogscript
 
+quietmode=1
+redirectlog
+
 newpage=$1
 newaddr=$2
 oldpage=$3
@@ -19,6 +22,6 @@ subject="[nai] EEPROM counter increased"
 msg="EEPROM counter increased at `date`.\n\nnewpage: $newpage\nnewaddr: $newaddr\noldpage: $oldpage\noldaddr: $oldaddr"
 $scriptdir/mail.sh nonoo@nonoo.hu "$subject" "$msg"
 
-$logrotateifneeded $logfile
+checklogsize
 
 echo "script finished."

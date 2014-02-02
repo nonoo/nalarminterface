@@ -10,6 +10,9 @@ logfile=$scriptdir/$scriptname.log
 source $scriptdir/$scriptname-config
 source $redirectlogscript
 
+quietmode=1
+redirectlog
+
 mkdir -p $smsdir/error
 mkdir -p $smsdir/inbox
 mkdir -p $smsdir/outbox
@@ -33,7 +36,7 @@ while [ 1 ]; do
 		fi
 	fi
 
-	$logrotateifneeded $logfile
+	checklogsize
 	$logrotateifneeded $binarylogfile
 
 	sleep 1

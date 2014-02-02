@@ -7,6 +7,9 @@ logfile=$scriptdir/$scriptname.log
 source $scriptdir/$scriptname-config
 source $redirectlogscript
 
+quietmode=1
+redirectlog
+
 p1state=$1
 p1int=$2
 p2state=$3
@@ -62,13 +65,13 @@ if [ ! -z $p4int ] && [ $p4int -eq 1 ]; then
 		echo "state on, sending sound alarm email."
 		subject="[nai] A hang erzekelo bekapcsolt"
 		msg="A szenzor hangot erzekelt: `date`"
-		$scriptdir/../mail/mail.sh nonoo@nonoo.hu "$subject" "$msg"
+#		$scriptdir/../mail/mail.sh nonoo@nonoo.hu "$subject" "$msg"
 #		$scriptdir/../mail/mail.sh dianno@dianno.hu "$subject" "$msg"
 	else
 		echo "state off, doing nothing."
 	fi
 fi
 
-$logrotateifneeded $logfile
+checklogsize
 
 echo "script finished."

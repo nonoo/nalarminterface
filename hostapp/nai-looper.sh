@@ -12,6 +12,9 @@ cd $scriptdir
 source $scriptdir/$scriptname-config
 source $redirectlogscript
 
+quietmode=1
+redirectlog
+
 lastmailsentat=0
 while [ 1 ]; do
 	if [ -z "`pidof $binary`" ]; then
@@ -30,7 +33,7 @@ while [ 1 ]; do
 		fi
 	fi
 
-	$logrotateifneeded $logfile
+	checklogsize
 	$logrotateifneeded $binarylogfile
 
 	sleep 1
