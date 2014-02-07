@@ -1,5 +1,5 @@
 binary="nai"
-mailto="nonoo@nonoo.hu"
+mailto=""
 minmailsendintervalinseconds=600
 logfile=/tmp/tmpfs/log/$scriptname.log
 binarylogfile=/tmp/tmpfs/log/$binary.log

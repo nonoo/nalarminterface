@@ -21,15 +21,19 @@ while [ 1 ]; do
 		echo "$binary not found, restarting."
 		$scriptdir/$binary 2>&1 | awk '{ print strftime("[%Y/%m/%d %H:%M:%S]"), $0; }' >> $binarylogfile &
 
-		currdate=`date +%s`
-		if [ $((currdate - $lastmailsentat)) -gt $minmailsendintervalinseconds ]; then
-			echo "sending notification email."
-			subject="[nai] $binary not found, restarting"
-			msg="$binary not found, restarting at `date`"
-			$scriptdir/../mail/mail.sh "$mailto" "$subject" "$msg"
-			lastmailsentat=$currdate
+		if [ ! -z "$mailto" ]; then
+			currdate=`date +%s`
+			if [ $((currdate - $lastmailsentat)) -gt $minmailsendintervalinseconds ]; then
+				echo "sending notification email."
+				subject="[nai] $binary not found, restarting"
+				msg="$binary not found, restarting at `date`"
+				$scriptdir/../mail/mail.sh "$mailto" "$subject" "$msg"
+				lastmailsentat=$currdate
+			else
+				echo "not sending notification email, because the timeout has not elapsed yet."
+			fi
 		else
-			echo "not sending notification email, because the timeout has not elapsed yet."
+			echo "not sending notification email, because destination mail address has not set in config."
 		fi
 	fi
 
