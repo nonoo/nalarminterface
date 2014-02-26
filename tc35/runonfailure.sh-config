@@ -1,0 +1,5 @@
+logfile=/tmp/tmpfs/log/$scriptname.log
+redirectlogscript=/ffp/home/admin/logrotate/redirectlog.src.sh
+logrotateifneeded=/ffp/home/admin/logrotate/logrotateifneeded.sh
+smserrbox=$scriptdir/sms/error
+mailto=nonoo@nonoo.hu

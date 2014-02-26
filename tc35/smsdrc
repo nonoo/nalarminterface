@@ -42,6 +42,7 @@ debuglevel = 0
 #phoneid = MyPhone1
 # Script to be executed when new message has been received
 runonreceive = /ffp/home/admin/nalarminterface/tc35/runonsmsreceive.sh
+runonfailure = /ffp/home/admin/nalarminterface/tc35/runonfailure.sh
 # Commication frequency settings
 commtimeout = 30
 sendtimeout = 30

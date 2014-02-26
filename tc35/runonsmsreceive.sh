@@ -24,7 +24,7 @@ for id in "$@"; do
 	from=`echo $id | cut -d'_' -f4`
 
 	subject="[nai] SMS received from $from"
-	msg="Received at: ${date:0:4}/${date:4:2}/${date:6:2} ${time:0:2}:${time:2:2}:${time:4:2}\nMail sent at: `date '+%Y/%m/%d %T %Z'`\n\nMessage: `cat $smsinbox/$id`"
+	msg="Received at: ${date:0:4}/${date:4:2}/${date:6:2} ${time:0:2}:${time:2:2}:${time:4:2}\nMail sent at: `date '+%Y/%m/%d %T %Z'`\n\nMessage:\n\n`cat $smsinbox/$id`"
 	echo "sending mail with subject \"$subject\", message \"$msg\""
 	$scriptdir/../mail/mail.sh $mailto "$subject" "$msg"
 done
