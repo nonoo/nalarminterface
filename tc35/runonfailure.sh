@@ -27,7 +27,7 @@ for id in "$@"; do
 
 	subject="[nai] $failtype failure $number"
 	failmsg="`cat $smserrbox/$id`"
-	msg="Direction: $direction\nFailed at: ${date:0:4}/${date:4:2}/${date:6:2} ${time:0:2}:${time:2:2}:${time:4:2}\nMail sent at: `date '+%Y/%m/%d %T %Z'`\n\nMessage:\n\n$failmsg"
+	msg="ID: $id\nDirection: $direction\nFailed at: ${date:0:4}/${date:4:2}/${date:6:2} ${time:0:2}:${time:2:2}:${time:4:2}\nMail sent at: `date '+%Y/%m/%d %T %Z'`\n\nMessage:\n\n$failmsg"
 	echo "sending mail with subject \"$subject\", message \"$msg\""
 	$scriptdir/../mail/mail.sh $mailto "$subject" "$msg"
 done
