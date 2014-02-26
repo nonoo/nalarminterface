@@ -23,8 +23,8 @@ gammu_smsd_start() {
 
 gammu_smsd_stop() {
 	proc_stop $command
-	killall gammu-smsd-looper.sh
-	killall gammu-smsd
+	killall -9 gammu-smsd-looper.sh
+	killall -9 gammu-smsd
 	echo unloading serial adapter kernel module
 	modprobe -r ch341
 }

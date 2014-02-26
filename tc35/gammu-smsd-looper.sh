@@ -37,7 +37,7 @@ while [ 1 ]; do
 	fi
 
 	checklogsize
-	$logrotateifneeded $binarylogfile
+	$logrotateifneeded $binarylogfile logcopytruncate
 
 	sleep 1
 done

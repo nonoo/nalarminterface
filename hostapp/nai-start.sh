@@ -21,7 +21,8 @@ nai_start() {
 
 nai_stop() {
 	proc_stop $command
-	killall nai
+	killall -9 nai-looper.sh
+	killall -9 nai
 }
 
 run_rc_command "$1"
