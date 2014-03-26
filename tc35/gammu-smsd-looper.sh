@@ -4,11 +4,10 @@
 # running and sends an email notification about the event.
 
 scriptname=`basename $0`
-scriptdir=${0/$scriptname/}
-logfile=$scriptdir/$scriptname.log
+scriptdir=${0%$scriptname}
 
-source $scriptdir/$scriptname-config
-source $redirectlogscript
+. $scriptdir/$scriptname-config
+. $nlogrotatepath/redirectlog.src.sh
 
 quietmode=1
 redirectlog
@@ -37,7 +36,7 @@ while [ 1 ]; do
 	fi
 
 	checklogsize
-	$logrotateifneeded $binarylogfile logcopytruncate
+	$nlogrotatepath/logrotateifneeded.sh $binarylogfile logcopytruncate
 
 	sleep 1
 done

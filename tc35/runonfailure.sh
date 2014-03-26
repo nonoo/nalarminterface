@@ -4,11 +4,10 @@
 # It sends the message to the given email address.
 
 scriptname=`basename $0`
-scriptdir=${0/$scriptname/}
-logfile=$scriptdir/$scriptname.log
+scriptdir=${0%$scriptname}
 
-source $scriptdir/$scriptname-config
-source $redirectlogscript
+. $scriptdir/$scriptname-config
+. $nlogrotatepath/redirectlog.src.sh
 
 quietmode=1
 redirectlog

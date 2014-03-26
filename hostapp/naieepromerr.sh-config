@@ -1,3 +1,2 @@
-logfile=/tmp/tmpfs/log/$scriptname.log
-redirectlogscript=/ffp/home/admin/logrotate/redirectlog.src.sh
-logrotateifneeded=/ffp/home/admin/logrotate/logrotateifneeded.sh
+logfile=/ffp/var/log/$scriptname.log
+nlogrotatepath=/ffp/home/admin/nlogrotate

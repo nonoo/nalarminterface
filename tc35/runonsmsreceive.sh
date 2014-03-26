@@ -5,10 +5,9 @@
 
 scriptname=`basename $0`
 scriptdir=${0/$scriptname/}
-logfile=$scriptdir/$scriptname.log
 
-source $scriptdir/$scriptname-config
-source $redirectlogscript
+. $scriptdir/$scriptname-config
+. $nlogrotatepath/redirectlog.src.sh
 
 quietmode=1
 redirectlog

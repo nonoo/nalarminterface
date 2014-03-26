@@ -3,8 +3,8 @@ binary="gammu-smsd"
 binaryparams="-c $scriptdir/smsdrc"
 mailto="nonoo@nonoo.hu"
 minmailsendintervalinseconds=600
-logfile=/tmp/tmpfs/log/$scriptname.log
-binarylogfile=/tmp/tmpfs/log/$binary.log
-redirectlogscript=/ffp/home/admin/logrotate/redirectlog.src.sh
-logrotateifneeded=/ffp/home/admin/logrotate/logrotateifneeded.sh
 smsdir=$scriptdir/sms
+
+logfile=/ffp/var/log/$scriptname.log
+binarylogfile=/ffp/var/log/$binary.log
+nlogrotatepath=/ffp/home/admin/nlogrotate

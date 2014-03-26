@@ -1,6 +1,6 @@
-logfile=/tmp/tmpfs/log/$scriptname.log
-redirectlogscript=/ffp/home/admin/logrotate/redirectlog.src.sh
-logrotateifneeded=/ffp/home/admin/logrotate/logrotateifneeded.sh
 smsdinject=/ffp/bin/gammu-smsd-inject
 smsto1=06xxxxxxxxx
 smsto2=06xxxxxxxxx
+
+logfile=/ffp/var/log/$scriptname.log
+nlogrotatepath=/ffp/home/admin/nlogrotate
