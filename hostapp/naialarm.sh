@@ -1,7 +1,8 @@
 #!/bin/sh
 
-scriptname=`basename $0`
-scriptdir=${0%$scriptname}
+self=`readlink -f "$0"`
+scriptname=`basename "$self"`
+scriptdir=${self%$scriptname}
 
 . $scriptdir/$scriptname-config
 . $nlogrotatepath/redirectlog.src.sh

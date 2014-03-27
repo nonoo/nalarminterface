@@ -3,8 +3,9 @@
 # This script gets called when gammu-smsd has failed processing an SMS.
 # It sends the message to the given email address.
 
-scriptname=`basename $0`
-scriptdir=${0%$scriptname}
+self=`readlink -f "$0"`
+scriptname=`basename "$self"`
+scriptdir=${self%$scriptname}
 
 . $scriptdir/$scriptname-config
 . $nlogrotatepath/redirectlog.src.sh
