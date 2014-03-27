@@ -13,7 +13,7 @@ connection = at9600
 ; Do not use model configuration unless you really need it
 ;model = tc35
 ;synchronizetime = yes
-;logfile = /tmp/tmpfs/log/gammu.log
+;logfile = /ffp/var/log/gammu.log
 ;logformat = textall
 ;use_locking = yes
 ;gammuloc = locfile

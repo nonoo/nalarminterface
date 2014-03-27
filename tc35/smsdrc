@@ -9,7 +9,7 @@ device = /dev/ttyUSB0
 connection = at9600
 #synchronizetime = yes
 # this is not used at all in SMSD mode
-logfile = /tmp/tmpfs/log/gammu-smsd.log
+logfile = /ffp/var/log/gammu-smsd.log
 logformat = textall
 #use_locking = yes
 #gammuloc = gammu.us
