@@ -3,7 +3,10 @@
 # This script gets called when gammu-smsd has failed processing an SMS.
 # It sends the message to the given email address.
 
-self=`readlink -f "$0"`
+self=`readlink "$0"`
+if [ -z "$self" ]; then
+	self=$0
+fi
 scriptname=`basename "$self"`
 scriptdir=${self%$scriptname}
 

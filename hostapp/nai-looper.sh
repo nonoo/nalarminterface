@@ -3,7 +3,10 @@
 # This script can be used to start the host app. It restarts it if it isn't
 # running and sends an email notification about the event.
 
-self=`readlink -f "$0"`
+self=`readlink "$0"`
+if [ -z "$self" ]; then
+	self=$0
+fi
 scriptname=`basename "$self"`
 scriptdir=${self%$scriptname}
 

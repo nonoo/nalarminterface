@@ -3,7 +3,10 @@
 # This script sets motion detection alarm on (1) or off (0) on the Foscam cameras.
 # Usage: ./foscam-setalarm [1|0]
 
-self=`readlink -f "$0"`
+self=`readlink "$0"`
+if [ -z "$self" ]; then
+	self=$0
+fi
 scriptname=`basename "$self"`
 scriptdir=${self%$scriptname}
 
